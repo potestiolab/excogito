@@ -1,0 +1,21 @@
+# created by Marco Giulini (marco.giulini@unitn.it)
+#
+# create environment:
+# conda env create --file conda_env_excogito.yml
+# -----
+# update environment:
+# conda env update --file conda_env_excogito.yml --prune
+# -----
+# Insert additional requirements at the bottom.
+# -----
+name: excogito
+channels:
+    - conda-forge
+    - anaconda
+dependencies:
+    - python=3.8.1
+    - numpy=1.18.1
+    - scipy=1.4.1
+    - pandas=1.0.0
+    - pip
+    - mdtraj=1.9.5
