@@ -382,3 +382,4 @@ A custom documentation can be generated in ```html``` and ```tex``` format by ru
 # 7. Contacts #
 
 Marco Giulini (mrcgiulini@gmail.com)
+Raffaello Potestio (raffaello.potestio@unitn.it)
