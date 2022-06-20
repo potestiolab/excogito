@@ -256,21 +256,21 @@ There exist 16 parameters, but only few of them are mandatory for the selected t
 | Parameter | Description | Type | Mandatory | Suggested value |
 | ----------- | ----------- | ---- | --------- | ---------------|
 | atomnum     | number of atoms in the system | int | all | |
-| frames   | number of frames in the trajectory | int | all | $` < 5000 \ \text{(on laptops),} \ < 15000 \ \text{if criterion} \ != 3`$ |
-| cgnum | number of CG sites | int | all | $` \in  [\frac{\text{atomnum}}{20} , \frac{\text{atomnum}}{2}] `$|
-| criterion | criterion for clustering | int | O-R-M |  $` \in {0, 1, 2, 3, 4}`$ |
-| nclust | number of CG macrostates | int | C0 - C3 |  $` \in [\frac{\text{frames}}{500}, \frac{\text{frames}}{100}] `$ |
+| frames   | number of frames in the trajectory | int | all | < 5000 on laptops, < 15000 if criterion != 3 |
+| cgnum | number of CG sites | int | all | between atomnum/20 and atomnum/2|
+| criterion | criterion for clustering | int | O-R-M |  0, 1, 2, 3, or 4|
+| nclust | number of CG macrostates | int | C0 - C3 | between frames/500, and frames/100|
 | n_mappings | number of mappings in tasks **random** and **distance** | int | R-D | | 
-| MC_steps | number of MC step in task **optimize** | int | O |  $` > 5000 `$ |
+| MC_steps | number of MC step in task **optimize** | int | O |  > 5000|
 | rotmats_period | MC steps between two full alignments in task **optimize** | int | O | |
 | t_zero | starting temperature in task **optimize** | double | O | |
 | distance |  cophenetic distance threshold | double | C1 | |
-| max_nclust | upper number of clusters | int | C2 | $` \in [\frac{\text{frames}}{100}, \frac{\text{frames}}{50}]`$ |
-| min_nclust | lower number of clusters | int | C2 | $` \in [\frac{\text{frames}}{1000},\frac{\text{frames}}{500}] \ \text{and} \ << \text{\ max\_nclust} `$  |
+| max_nclust | upper number of clusters | int | C2 | between frames/100 and frames/50|
+| min_nclust | lower number of clusters | int | C2 | between frames/1000 and frames/500 (must be < max\_nclust)|
 | Ncores | number of cores | int | no | |
 | decay_time | governs temperature decay in task **optimize** | double | O | |
 | rsd | use rsd (if 1) instead of rmsd (if 0) | int | no | |
-| stride | number of structures between two pivot configurations | int | C3 | $` \sim 10 \ \text{if frames} \in [10^4, 10^5]`$ |
+| stride | number of structures between two pivot configurations | int | C3 | ~ 10 if frames between 1000 and 10000|
 
 O-R-M-D refer to the tasks (optimize/optimize_kl, random/random_kl, measure/measure_kl, distance) in which the parameter is mandatory. C0 .. C3 indicates that the parameter is mandatory if the clustering criterion is equal to 0 .. 3, respectively.
 
