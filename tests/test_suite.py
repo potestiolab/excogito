@@ -39,7 +39,7 @@ class test0(unittest.TestCase):
         path = pl.Path("test0/log_test0.log")
         self.assertEqual((str(path), path.is_file()), (str(path), True))
     def test0_head_tail(self):
-        """check first and last line of log"""
+        """check log's head, tail and size"""
         rfile = open("test0/log_test0.log", "r")
         lines = rfile.read().split("\n")
         rfile.close()
@@ -47,6 +47,7 @@ class test0(unittest.TestCase):
         tail_line = lines[-2]
         self.assertEqual(head_line, "parameter file is ../files/parameters/parameters_optimize_6d93_N31_small.ini") 
         self.assertEqual(tail_line, "finished mapping optimisation") # finished SA
+        self.assertTrue(len(lines) < 10000)
 
 class test1(unittest.TestCase):
     """
@@ -75,11 +76,10 @@ class test1(unittest.TestCase):
                     nrd_effective += 1
                 elif line.startswith("random_smap = "):
                     nrd_smaps += 1
-        # checks
         self.assertEqual(nrd_declared,nrd_effective)
         self.assertEqual(nrd_declared,nrd_smaps)
     def test1_head_tail(self):
-        """check log's head and tail"""
+        """check log's head, tail and size"""
         rfile = open("test1/log_test1.log", "r")
         lines = rfile.read().split("\n")
         rfile.close()
@@ -87,6 +87,7 @@ class test1(unittest.TestCase):
         tail_line = lines[-2]
         self.assertEqual(head_line, "parameter file is ../files/parameters/parameters_random_6d93_N31_small.ini")  # ini invece di Dat 
         self.assertEqual(tail_line, "finished random mappings generation")
+        self.assertTrue(len(lines) < 1000)
 
 class test2(unittest.TestCase):
     """
@@ -102,12 +103,13 @@ class test2(unittest.TestCase):
         path = pl.Path("test2/6d93_loaded_N31.dat")
         self.assertEqual((str(path), path.is_file()), (str(path), True))
     def test2_head_tail(self):
-        """check parameter file is correct and that clusters are written"""
+        """check parameter file is correct and that file length is not excessive"""
         rfile = open("test2/log_test2.log", "r")
         lines = rfile.read().split("\n")
         rfile.close()
         head_line = lines[0]
         self.assertEqual(head_line, "parameter file is ../files/parameters/parameters_measure_6d93_N31.ini")
+        self.assertTrue(len(lines) < 1000)
     def test2_correct_smap(self):
         """check that the mapping entropy is correct """
         rfile = open("test2/6d93_loaded_N31.dat", "r")

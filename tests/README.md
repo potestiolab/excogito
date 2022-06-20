@@ -4,6 +4,11 @@ We employ python [Unittest](https://docs.python.org/3/library/unittest.html) cla
 The file *test_suite.py* contains some Unittest Test Cases that should be run in order to be sure that the compilation went succesfully.
 
 ```bash
+python3 test_suite.py
+```
+
+Or, for verbose output:
+```bash
 python3 test_suite.py -v
 ```
 

@@ -168,7 +168,6 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
         }
     }
 
-
     /* Checking for empty rows; 
      * Checking that there are ONLY rows with one column and three columns 
      * Checking that the rows with one column correspond to an integer number i.e. the number of atoms; 
@@ -184,7 +183,6 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
         getline(&string, &line_buf_size, ft);           // Reading entire line;   
    
         strcpy(line, string);                           // Copying "string" in "line"; we need it in case of three columns. 
-        printf(line);         
 
         if( i != (Trajectory->n_at + 2)*(frame_idx-1) + 1)  // Checking for empty rows except for the 2nd row of each frame representing the title
             check_empty_rows(string);                   // that could also be an empty string   
@@ -295,7 +293,7 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
     free(string);
     //free(token);
     free(line);
-    fclose(ft);                                         // Close trajectory file. 
+    fclose(ft);// Close trajectory file. 
     // 1st check: frame_idx must be = frames
     if (frame_idx !=  Trajectory->frames) {
         fe = fopen("error.dat", "w");
@@ -320,17 +318,4 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
             exit(EXIT_FAILURE);
         }
     }
-
-    /* PRINT XYZ TRAJECTORY */ 
-    /* for(i = 0; i < Trajectory->frames; i++){
-        printf("%d\n", Trajectory->n_at);  
-        for(j = 0; j < Trajectory->n_at; j++){
-            printf("%f ",   Trajectory->traj_coords[i][3 * j + 0]);
-            printf("%f ",   Trajectory->traj_coords[i][3 * j + 1]);
-            printf("%f \n", Trajectory->traj_coords[i][3 * j + 2]);
-        }
-    printf("\n"); 
-    } */
-
-
 }

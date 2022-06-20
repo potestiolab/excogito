@@ -1,5 +1,4 @@
 # script to generate a valid parameter file
-from datetime import datetime
 
 print("guided generation of the parameter file for EXCOGITO")
 
