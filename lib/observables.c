@@ -474,12 +474,12 @@ void overall_compute_smap(alignments *align, clust_params *clustering, traj *Tra
     double **Z;
     mapping->smap = 0.0;
     int k;
-    if (clustering->crit != 3) {
+    if (clustering->crit != 1) {
         Z = d2t(Trajectory->frames - 1, 4);
         // linkage matrix
         hierarchical_clustering(align->rmsd_mat, Trajectory->frames, Trajectory->pairs, mapping->size, Z);
         // observable computation
-        if (clustering->crit == 0 || clustering->crit == 4) {
+        if (clustering->crit == 0) {
             if (verbose == 1) {
                 printf("criterion %d (maxclust): clustering of dist_mat (len %d, %d frames) into %d clusters \n", clustering->crit,
                        Trajectory->pairs, Trajectory->frames, clustering->ncl);
@@ -493,7 +493,7 @@ void overall_compute_smap(alignments *align, clust_params *clustering, traj *Tra
                 for (cl_id = 0; cl_id < Trajectory->frames; cl_id++) { printf("%d ", mapping->clusters[cl_id]); }
                 printf("\n");
             }
-        } else if (clustering->crit == 1) {
+        } else if (clustering->crit == 3) {
             // It means it's distance-based clustering
             if (verbose == 1) {
                 printf("Warning: criterion %d for computing observable, distance-based clustering\nNOT COMPATIBLE WITH Giulini et. al (2020)\n",

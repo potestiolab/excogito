@@ -45,8 +45,8 @@ void measure(arguments *arguments, parameters *cc){
     Trajectory->traj_coords = d2t(cc->frames, 3 * cc->atomnum);
     Trajectory->energies = d1t(cc->frames);
     Trajectory->stride = cc->stride;
-    if (clustering->crit == 3){
-        printf("criterion = 3\n");
+    if (clustering->crit == 1){
+        printf("criterion = %d\n", clustering->crit);
         printf("cc->frames/cc->stride = %d\n",cc->frames/cc->stride);
         if ((Trajectory->frames-1)%Trajectory->stride == 0){
             Trajectory->eff_frames = cc->frames/cc->stride + 1;
@@ -93,7 +93,7 @@ void measure(arguments *arguments, parameters *cc){
     align->rotation_matrices = d2t(Trajectory->pairs, 9);
     align->coms = d2t(cc->frames, 3);
     align->rsd = cc->rsd;
-    if (clustering->crit == 3){
+    if (clustering->crit == 1){
         align->rmsd_vector = d1t(Trajectory->frames * 2);
         align->rotation_matrices_vector = d2t(Trajectory->frames * 2, 9);
     }
@@ -104,7 +104,7 @@ void measure(arguments *arguments, parameters *cc){
     fprintf(f_out_l, "mapping file is %s\n", arguments->mapping_file); 
     // load external mapping
     read_MappingFile(arguments->mapping_file, f_out_l, mapping); 
-    if (clustering->crit==3){
+    if (clustering->crit==1){
         cycle_alignment_fastclust(Trajectory, align, mapping);            
     }
     else{cycle_alignment(Trajectory, align, mapping);}
@@ -122,7 +122,7 @@ void measure(arguments *arguments, parameters *cc){
     free_d1t(align->rmsd_mat);
     free_d2t(align->rotation_matrices);
     free_d2t(align->coms);
-    if (clustering->crit == 3){
+    if (clustering->crit == 1){
         free_d1t(align->rmsd_vector);
         free_d2t(align->rotation_matrices_vector);
     }
@@ -130,7 +130,7 @@ void measure(arguments *arguments, parameters *cc){
     // free trajectory
     free_d2t(Trajectory->traj_coords);
     free_d1t(Trajectory->energies);
-    if (clustering->crit == 3){free_i1t(Trajectory->strides);}
+    if (clustering->crit == 1){free_i1t(Trajectory->strides);}
     free(Trajectory);
     // free clustering
     free(clustering);

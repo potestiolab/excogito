@@ -33,7 +33,7 @@ pars_description = {
     "n_mappings": "number of coarse-grained mappings",
     "MC_steps" : "number of Monte Carlo steps",
     "rotmats_period" : "steps between two calculations of rotation matrices ",
-    "criterion" : "criterion for hierarchical clustering:\n0 : fixed number of clusters\n1 : cophenetic distance\n2 : multiple numbers of clusters\n3 : fast clustering on a subset of configurations (only for continuous trajectories)",
+    "criterion" : "criterion for hierarchical clustering:\n0 : fixed number of clusters\n1 : fast clustering on a subset of configurations (only for continuous trajectories)\n2 : multiple numbers of clusters\n3 : cophenetic distance",
     "Ncores" : "number of cores to use",
     "t_zero" : "starting temperature for Simulated Annealing",
     "nclust" : "number of clusters",
@@ -68,9 +68,9 @@ pars_type = {
 
 clustering_pars = {
     0: [ "nclust" ],
-    1: [ "distance" ],
+    1: [ "stride", "nclust"],
     2: [ "min_nclust", "max_nclust" ],
-    3: [ "stride", "nclust"]
+    3: [ "distance" ]
 }
 
 # mandatory parameters for every task

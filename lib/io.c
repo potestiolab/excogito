@@ -819,7 +819,7 @@ void check_optional_parameters(parameters *cc){
                 }
             }
         }
-        else if(cc->criterion == 1){
+        else if(cc->criterion == 3){
             // cophenetic distance clustering
             if (cc->Flag_distance != 1){
                 fe = fopen("error.dat", "w");
@@ -864,7 +864,7 @@ void check_optional_parameters(parameters *cc){
                 }
             }
         }
-        else if (cc->criterion == 3){
+        else if (cc->criterion == 1){
             // fast clustering
             if (cc->Flag_nclust != 1){
                 fe = fopen("error.dat", "w");
