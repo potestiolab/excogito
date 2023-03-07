@@ -256,21 +256,21 @@ There exist 16 parameters, but only few of them are mandatory for the selected t
 | Parameter | Description | Type | Mandatory | Suggested value |
 | ----------- | ----------- | ---- | --------- | ---------------|
 | atomnum     | number of atoms in the system | int | all | |
-| frames   | number of frames in the trajectory | int | all | < 5000 on laptops, < 15000 if criterion != 3 |
+| frames   | number of frames in the trajectory | int | all | < 5000 on laptops, < 15000 if criterion != 1 |
 | cgnum | number of CG sites | int | all | between atomnum/20 and atomnum/2|
-| criterion | criterion for clustering | int | O-R-M |  0, 1, 2, 3, or 4|
+| criterion | criterion for clustering | int | O-R-M |  0, 1, 2, 3|
 | nclust | number of CG macrostates | int | C0 - C3 | between frames/500, and frames/100|
 | n_mappings | number of mappings in tasks **random** and **distance** | int | R-D | | 
 | MC_steps | number of MC step in task **optimize** | int | O |  > 5000|
 | rotmats_period | MC steps between two full alignments in task **optimize** | int | O | |
 | t_zero | starting temperature in task **optimize** | double | O | |
-| distance |  cophenetic distance threshold | double | C1 | |
+| distance |  cophenetic distance threshold | double | C3 | |
 | max_nclust | upper number of clusters | int | C2 | between frames/100 and frames/50|
 | min_nclust | lower number of clusters | int | C2 | between frames/1000 and frames/500 (must be < max\_nclust)|
 | Ncores | number of cores | int | no | |
 | decay_time | governs temperature decay in task **optimize** | double | O | |
 | rsd | use rsd (if 1) instead of rmsd (if 0) | int | no | |
-| stride | number of structures between two pivot configurations | int | C3 | ~ 10 if frames between 1000 and 10000|
+| stride | number of structures between two pivot configurations | int | C1 | ~ 10 if frames between 1000 and 10000|
 
 O-R-M-D refer to the tasks (optimize/optimize_kl, random/random_kl, measure/measure_kl, distance) in which the parameter is mandatory. C0 .. C3 indicates that the parameter is mandatory if the clustering criterion is equal to 0 .. 3, respectively.
 
@@ -279,9 +279,9 @@ O-R-M-D refer to the tasks (optimize/optimize_kl, random/random_kl, measure/meas
 Four criteria for hierarchical clustering:
 
 - **0** *Maxclust* clustering: configurations are lumped into *Nclust* macrostates;
-- **1** *Maxdist* clustering: clustering with the cophenetic distance;
+- **1** *Fast clustering*: as in criterion **0**, but applied to a set of pivot configurations. Labels of intermediate structures are assigned to the closer pivot;
 - **2** *Multiple maxclust*: as described in *Giulini et al.* (JCTC, 2020);
-- **3** *Fast clustering*: as in criterion **0**, but applied to a set of pivot configurations. Labels of intermediate structures are assigned to the closer pivot;
+- **3** *Maxdist* clustering: clustering with the cophenetic distance;
 
 ## 3.2. Trajectory FILE ##
 
