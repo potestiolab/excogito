@@ -371,7 +371,7 @@ Inside the directory examples there are example files for the *6d93* protein, al
 
 # 5. Scaling values #
 
-The approximated mapping entropy is calculated (tasks **optimize**, **random** and **measure**) without the scaling factor $` \frac{k_B \beta^2}{2}  `$ (see. [Giulini et al.](https://pubs.acs.org/doi/abs/10.1021/acs.jctc.0c00676)). This factor should be computed by the user according to the temperature employed to simulate the system.
+The approximated mapping entropy is calculated (tasks **optimize**, **random** and **measure**) without the scaling factor ![equ](https://latex.codecogs.com/gif.latex?\frac{k_B\beta^2}{2}) (see. [Giulini et al.](https://pubs.acs.org/doi/abs/10.1021/acs.jctc.0c00676)). This factor should be computed by the user according to the temperature employed to simulate the system.
 
 # 6. Documentation #
 
