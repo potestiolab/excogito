@@ -686,5 +686,5 @@ class test26(unittest.TestCase):
         kl_line = lines[1]
         self.assertEqual(kl_line,"explicitly calculating Kullback-Leibler divergences")
 
-if __name__ == '__main__':
-    unittest.main()
+#if __name__ == '__main__':
+#    unittest.main()
