@@ -1,8 +1,6 @@
 # test suite for build/excogito
 BUILDDIR=../../build
 
-#rm test*/*
-
 declare -a HashTable=( "test0:$BUILDDIR/excogito optimize -p ../files/parameters/parameters_optimize_6d93_N31_small.ini -t ../files/trajectories/6d93_100frames.xyz -e ../files/energies/6d93_energies_100frames.txt -c 6d93"
 "test1:$BUILDDIR/excogito random -p ../files/parameters/parameters_random_6d93_N31_small.ini -t ../files/trajectories/6d93_100frames.xyz -e ../files/energies/6d93_energies_100frames.txt -c 6d93"
 "test2:$BUILDDIR/excogito measure -p ../files/parameters/parameters_measure_6d93_N31.ini -t ../files/trajectories/6d93_1000frames.xyz -e ../files/energies/6d93_energies_1000frames.txt -c 6d93 -m ../files/mappings/tamapin_ca_mapping.txt"
@@ -36,7 +34,7 @@ test_id="${test_line%%:*}"
 echo $test_id
 if [ -d "$test_id" ];
 then
-echo "directory exists"
+echo "directory ${test_id} exists"
 rm -r $test_id/*
 fi
 done
