@@ -24,7 +24,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip pathlib subprocess
+        python -m pip install --upgrade pip pathlib
     
     - name: go to test
       run: cd tests
