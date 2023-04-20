@@ -40,8 +40,11 @@ jobs:
     - name: test
       run: |
         cd tests
+        echo "current directory"
         ls
+        echo ".."
         ls ..
+        echo "../build"
         ls ../build
         python test_suite.py
         cd -
