@@ -17,6 +17,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
+    - name: build excogito
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+        make
+        cd -
+    
     - name: Set up Python 3.8
       uses: actions/setup-python@v4
       with:
