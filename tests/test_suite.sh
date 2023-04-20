@@ -1,6 +1,6 @@
+#!/bin/bash
 # test suite for build/excogito
 BUILDDIR=../../build
-rm test*/*
 
 declare -a HashTable=( "test0:$BUILDDIR/excogito optimize -p ../files/parameters/parameters_optimize_6d93_N31_small.ini -t ../files/trajectories/6d93_100frames.xyz -e ../files/energies/6d93_energies_100frames.txt -c 6d93"
 "test1:$BUILDDIR/excogito random -p ../files/parameters/parameters_random_6d93_N31_small.ini -t ../files/trajectories/6d93_100frames.xyz -e ../files/energies/6d93_energies_100frames.txt -c 6d93"
@@ -29,6 +29,16 @@ declare -a HashTable=( "test0:$BUILDDIR/excogito optimize -p ../files/parameters
 "test24:$BUILDDIR/excogito optimize_kl -p ../files/parameters/parameters_optimizekl_6d93_N31_notemp.ini -t ../files/trajectories/6d93_100frames.xyz -r ../files/energies/6d93_probs_100frames.txt -c 6d93"
 "test25:$BUILDDIR/excogito measure_kl -p ../files/parameters/parameters_measurekl_6d93_N31.ini -t ../files/trajectories/6d93_100frames.xyz -r ../files/energies/6d93_probs_100frames.txt -c 6d93 -m ../files/mappings/tamapin_ca_mapping.txt"
 "test26:$BUILDDIR/excogito random_kl -p ../files/parameters/parameters_randomkl_6d93_N31.ini -t ../files/trajectories/6d93_100frames.xyz -r ../files/energies/6d93_probs_100frames.txt -c 6d93")
+
+for test_line in "${HashTable[@]}"; do
+test_id="${test_line%%:*}"
+echo $test_id
+if [ -d "$test_id" ];
+then
+echo "directory ${test_id} exists"
+rm -r $test_id/*
+fi
+done
 
 for test_line in "${HashTable[@]}"; do
 test_id="${test_line%%:*}"
