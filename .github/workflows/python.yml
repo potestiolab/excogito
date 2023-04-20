@@ -24,7 +24,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip unittest pathlib os subprocess
+        python -m pip install --upgrade pip pathlib os subprocess
     
     - name: go to test
       run: cd tests
