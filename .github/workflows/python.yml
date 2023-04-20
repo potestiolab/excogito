@@ -24,6 +24,8 @@ jobs:
         cd build
         cmake ..
         make
+        pwd
+        ls
         cd -
     
     - name: Set up Python 3.8
