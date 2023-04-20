@@ -1,0 +1,33 @@
+name: test
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip unittest pathlib os subprocess
+    
+    - name: go to test
+      run: cd tests
+    - name: test
+      run: python test_suite.py
+    
