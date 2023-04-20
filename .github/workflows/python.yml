@@ -46,5 +46,5 @@ jobs:
         ls ..
         echo "../build"
         ls ../build
-        python test_suite.py
+        ./test_suite.sh
         cd -
