@@ -1,3 +1,4 @@
+#!/bin/bash
 # test suite for build/excogito
 BUILDDIR=../../build
 
