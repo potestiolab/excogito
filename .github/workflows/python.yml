@@ -24,8 +24,6 @@ jobs:
         cd build
         cmake ..
         make
-        pwd
-        ls
         cd -
     
     - name: Set up Python 3.8
@@ -40,11 +38,5 @@ jobs:
     - name: test
       run: |
         cd tests
-        echo "current directory"
-        ls
-        echo ".."
-        ls ..
-        echo "../build"
-        ls ../build
-        ./test_suite.sh
+        python test_suite.py
         cd -
