@@ -24,7 +24,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip pathlib
+        python -m pip install --upgrade pip pathlib numpy
     
     - name: test
       run: |
