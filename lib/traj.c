@@ -3,6 +3,7 @@
 #include <io.h>
 #include <stdlib.h>
 #include <ini.h>
+#include <float.h>
 
 int check_probabilities(double *probabilities, int prob_length){
     /**
@@ -90,6 +91,12 @@ void read_EnergyFile(char *EnergyFileName, traj *Trajectory){
 
         /* Checking for not-empty rows, only one column per row, each row is only FLOAT. Assign each float-string to energy[i] array */
         //string = (char*) malloc (rows_i);                                // Allocate char string 
+	
+	char out_filename[100];
+        sprintf(out_filename, "./RESULTS/Probabilities_read.csv");
+        FILE* f_prob;
+        f_prob = open_file_w(out_filename);
+
 
         for(i=0; i<rows_i; i++) {
 
@@ -102,8 +109,10 @@ void read_EnergyFile(char *EnergyFileName, traj *Trajectory){
             cols_i = columns(token);   		                     // Counting the number of columns in each row of file.  
 
             if(cols_i == 1){
-                check_float_string(string, i, EnergyFileName);       // If #column in each row is 1, then check that the column is a float number. 
+                //check_float_string(string, i, EnergyFileName);       // If #column in each row is 1, then check that the column is a float number. 	//(!)
                 Trajectory->energies[i] = atof(string);              // Assigning each float-string to energy[i] 1D-array. 
+                Trajectory->energies_cg[i] = Trajectory->energies[i];              	//(!)
+		fprintf(f_prob, "%.*e\n", 15, Trajectory->energies[i]); 			//(!)
             }
 
             if(cols_i > 1){
@@ -161,10 +170,11 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
 
     /* Initialize the 2D-array Trajectory->traj_coords[][] */
     for(i = 0; i < Trajectory->frames; i++){
-        for(j = 0; j < Trajectory->n_at; j++){
-            Trajectory->traj_coords[i][3 * j + 0] = 0.0;
+        for(j = 0; j < Trajectory->n_at + 1; j++){
+            Trajectory->traj_coords[i][j] = 0.0;					//(!)
+            /*Trajectory->traj_coords[i][3 * j + 0] = 0.0;
             Trajectory->traj_coords[i][3 * j + 1] = 0.0;
-            Trajectory->traj_coords[i][3 * j + 2] = 0.0;
+            Trajectory->traj_coords[i][3 * j + 2] = 0.0;*/
         }
     }
 
@@ -175,9 +185,10 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
 
     frame_idx = 0;                                      // Initialize frame index to  0 
     p  = 0;                                             // Initialize counter "p" to 0 
+    float sum = 0;    
 
     for(i=0; i<rows_i; i++){
-        if(p>=3*Trajectory->n_at)                       // p increases from 0 to 3*atomnum i.e. p=[0;3*230) i.e. p = [0;689]
+        if(p>=Trajectory->n_at)                       // p increases from 0 to 3*atomnum i.e. p=[0;3*230) i.e. p = [0;689] //(!)
             p = 0; 
 
         getline(&string, &line_buf_size, ft);           // Reading entire line;   
@@ -195,13 +206,17 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
         if(i!=(Trajectory->n_at + 2)*(frame_idx-1) + 1){   // exclude the 2nd row of each frame 
 
             if(cols_i == 1){
-
+            
                 if(i != (Trajectory->n_at + 2)*frame_idx) {
                     printf("Error. The %dth frame contains a different number of rows. Each frame must have %d rows\n", frame_idx+1, Trajectory->n_at + 2);
                     exit(EXIT_FAILURE);
                 } 
                 else{
                     frame_idx++;
+		    if (i > 0) { //Saving the sum of all spins value for the frame [frame_idx - 2]
+                        Trajectory->traj_coords[frame_idx - 2][Trajectory->n_at] = sum;
+                        sum = 0;
+                    }
                     if(frame_idx>Trajectory->frames){
                         fe = fopen("error.dat", "w");
                         fprintf(fe, "Error. The number of trajectory frames is higher than the declared one in parameter file (%d).\nAborting\n", Trajectory->frames);
@@ -222,7 +237,7 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
                 }
             }
     
-            if(cols_i == 2){
+            /*if(cols_i == 2){								//(!)
  
                 if(i != (Trajectory->n_at + 2)*frame_idx + 1){
                     fe = fopen("error.dat", "w");
@@ -234,9 +249,37 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
                     fclose(fe); 
                     exit(EXIT_FAILURE);
                 }
-            }
+            }*/
+            
+            if (cols_i == 2) {								//(!)
+                if (i != (Trajectory->n_at + 2) * frame_idx) {
+                    token_arr[0] = strtok(line, " \t\v\r\n");
 
-            if(cols_i == 3){
+                    count = 0;
+                    while (token_arr[count]) {
+                        count++;
+                        token_arr[count] = strtok(NULL, " \t\v\r\n");
+                    }
+
+                    for (j = 1; j <= count - 1; j++) {
+                        //check_float_string(token_arr[j], i, TrajFileName);                     // Checking that each row is an FLOAT number.		//(!)
+                        Trajectory->traj_coords[frame_idx - 1][p] = atof(token_arr[j]);          // Assigning each float-string to traj_coords[i][j] 2D-array 
+			sum += Trajectory->traj_coords[frame_idx - 1][p];
+                        p++;
+                    }
+
+                }
+
+                else {
+                    printf("Error. Each row of the frame (except the 1st row containing the number of atoms and the 2nd row containing the title),\n\
+                    must contain 1 column corresponding to a spin state. Check also if there is one extra row in %dth frame\n",//CHANGED
+                        frame_idx);
+                    exit(EXIT_FAILURE);
+                }
+            }
+            
+
+            /*if(cols_i == 3){								//(!)
  
                 if(i != (Trajectory->n_at + 2)*frame_idx + 1){
                     fe = fopen("error.dat", "w");
@@ -275,13 +318,13 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
                             frame_idx); 
                     exit(EXIT_FAILURE);
                 }
-            }
+            }*/
 
-            if(cols_i > 4 ){ 
+            if(cols_i > 2 ){ 								//(!)
                 if(i != (Trajectory->n_at + 2)*frame_idx){ 
                     fe = fopen("error.dat","w"); 
-                    fprintf(fe,     "Error. The maximum number of columns allowed is 4. The %dth row of your file contains %d columns\n", i+1, cols_i);
-                    printf("Error. The maximum number of columns allowed is 4. The %dth row of your file contains %d columns\n", i+1, cols_i);
+                    fprintf(fe,     "Error. The maximum number of columns allowed is 2. The %dth row of your file contains %d columns\n", i+1, cols_i);
+                    printf("Error. The maximum number of columns allowed is 2. The %dth row of your file contains %d columns\n", i+1, cols_i);
                     fclose(fe); 
                     exit(EXIT_FAILURE);
                 }
