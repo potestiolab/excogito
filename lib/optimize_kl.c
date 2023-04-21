@@ -33,11 +33,12 @@ void optimize_kl(arguments *arguments, parameters *cc){
     traj *Trajectory = malloc (sizeof(traj));
     Trajectory->frames = cc->frames;
     Trajectory->n_at = cc->atomnum;
-    Trajectory->traj_coords = d2t(cc->frames, 3 * cc->atomnum);
+    Trajectory->traj_coords = d2t(cc->frames, 1 * cc->atomnum + 1);			//(!)
     Trajectory->energies = d1t(cc->frames);
+    Trajectory->energies_cg = d1t(cc->frames); 						//(!)
     Trajectory->stride = cc->stride;
-    if (clustering->crit == 1){
-        printf("criterion = %d\n", clustering->crit);
+    if (clustering->crit == 3){
+        printf("criterion = 3\n");
         printf("cc->frames/cc->stride = %d\n",cc->frames/cc->stride);
         if ((Trajectory->frames-1)%Trajectory->stride == 0){
             Trajectory->eff_frames = cc->frames/cc->stride + 1;
@@ -65,11 +66,10 @@ void optimize_kl(arguments *arguments, parameters *cc){
     int nthreads, tid;
     // read files
     printf("reading trajectory\n");
-    read_TrajectoryFile(arguments->trajectory_file, Trajectory);
+    read_TrajectoryFile(arguments->trajectory_file, Trajectory);			//(!)
     printf("reading probabilities\n");
-    read_EnergyFile(arguments->probability_file, Trajectory);
+    read_EnergyFile(arguments->probability_file, Trajectory);				//(!)
     int i;
-    for (i = 0; i < Trajectory->frames; i++){printf("energies %d = %lf\n", i, Trajectory->energies[i]);}
     int isprob = check_probabilities(Trajectory->energies, Trajectory->frames);
     if (isprob != 1){
         fe = fopen("error.dat", "w");
@@ -106,10 +106,10 @@ void optimize_kl(arguments *arguments, parameters *cc){
             {
             #pragma omp for schedule(static, 1)
                 for (q = 0; q < nthreads; q++) {
-                    sprintf(out_filename, "./%skl_fast_delta_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
+                    sprintf(out_filename, "./OUTPUT_FILES/%skl_fast_delta_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
                     FILE *f_out_l;
                     f_out_l = open_file_w(out_filename);
-                    tzeros[q] = tzero_estimation(Trajectory, clustering, cc->cgnum, cc->rsd, arguments->verbose, 1, f_out_l);
+                    tzeros[q] = tzero_estimation(Trajectory, cc->cgnum, cc->rsd, arguments->verbose, 1, f_out_l);
                     fprintf(f_out_l, "t_zero[%d] estimation concluded: starting temperature for simulated annealing = %8.6lf", q, tzeros[q]);
                     fclose(f_out_l);
                 }
@@ -126,11 +126,12 @@ void optimize_kl(arguments *arguments, parameters *cc){
         {
 #pragma omp for schedule(static, 1)
             for (q = 0; q < nthreads; q++) {
-                sprintf(out_filename, "./%skl_SA_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
+                sprintf(out_filename, "./OUTPUT_FILES/%skl_SA_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
                 FILE *f_out_l;
                 f_out_l = open_file_w(out_filename);
                 MC_params *SA_params = malloc (sizeof(MC_params));
-                SA_params->t_zero = cc->t_zero;
+                SA_params->t_zero = cc->t_zero;					//(!)
+		//SA_params->t_zero = 0.2;					//(!)
                 SA_params->MC_steps = cc->MC_steps;
                 if (cc->Flag_decay_time != 1){
                     double d_decay_time = -SA_params->MC_steps*1.0/log(0.001); // so that to have 1/1000 of the start temperature at the end. TODO: convert to float
@@ -140,20 +141,20 @@ void optimize_kl(arguments *arguments, parameters *cc){
                 else{SA_params->decay_time = cc->decay_time;}
                 SA_params->rotmats_period = cc->rotmats_period;
                 printf("rsd = %d\n", cc->rsd);
-                simulated_annealing(Trajectory, clustering, SA_params, cc->cgnum, cc->rsd, arguments->verbose, 1, f_out_l);
+                simulated_annealing(Trajectory, SA_params, cc->cgnum, cc->rsd, arguments->verbose, 1, f_out_l, q);
                 fclose(f_out_l);
                 // free SA_params
                 free(SA_params);
             }
 #pragma omp barrier
         }
+        
+        
         printf("finished pragma part\n");
         printf("finished mapping optimisation");
         // free trajectory
         free_d2t(Trajectory->traj_coords);
         free_d1t(Trajectory->energies);
-        if (clustering->crit == 1){free_i1t(Trajectory->strides);}
         free(Trajectory);
-        // free clustering
         free(clustering);
 }
