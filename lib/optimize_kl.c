@@ -37,28 +37,8 @@ void optimize_kl(arguments *arguments, parameters *cc){
     Trajectory->energies = d1t(cc->frames);
     Trajectory->energies_cg = d1t(cc->frames); 						//(!)
     Trajectory->stride = cc->stride;
-    if (clustering->crit == 3){
-        printf("criterion = 3\n");
-        printf("cc->frames/cc->stride = %d\n",cc->frames/cc->stride);
-        if ((Trajectory->frames-1)%Trajectory->stride == 0){
-            Trajectory->eff_frames = cc->frames/cc->stride + 1;
-        }
-        else{
-            Trajectory->eff_frames = (cc->frames-1)/cc->stride + 2;
-        }
-        printf("effective frames = %d\n", Trajectory->eff_frames);
-        Trajectory->pairs = Trajectory->eff_frames * (Trajectory->eff_frames - 1)/ 2;
-        Trajectory->strides = i1t(cc->frames);
-        int idx = 0;
-        for (idx = 0; idx < cc->frames; idx++){
-            if (idx%cc->stride == 0) {Trajectory->strides[idx] = 1;}
-            else{Trajectory->strides[idx] = 0;}
-        }
-        Trajectory->strides[cc->frames-1] = 1;
-        printf("strides\n");
-        for (idx = 0; idx < cc->frames; idx++){printf("%d ", Trajectory->strides[idx]);}
-    }
-    else{Trajectory->pairs = cc->frames * (cc->frames - 1) / 2;}
+    
+    Trajectory->pairs = cc->frames * (cc->frames - 1) / 2;
     printf("frames = %d\n", Trajectory->frames);
     // computing parameters and allocating objects
     printf("overall pairs = %d\n", Trajectory->pairs);
