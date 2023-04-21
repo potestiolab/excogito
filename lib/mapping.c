@@ -20,6 +20,8 @@ void free_mapping(cg_mapping *mapping){
     free_i1t(mapping->mapping);
     free_i1t(mapping->clusters);
     free_i1t(mapping->size);
+    free_i1t(mapping->idx_cluster);//ADDED						//(!)
+    free_i1t(mapping->omega);//ADDED							//(!)
     free(mapping);
 }
 
@@ -101,6 +103,8 @@ void update_mapping(cg_mapping *curr_mapping, cg_mapping *old_mapping, int frame
     for (fr_idx = 0; fr_idx < frames; fr_idx++) {
         old_mapping->clusters[fr_idx] = curr_mapping->clusters[fr_idx];
         old_mapping->size[fr_idx] = curr_mapping->size[fr_idx];
+        old_mapping->idx_cluster[fr_idx] = curr_mapping->idx_cluster[fr_idx];//ADDED	//(!)
+        old_mapping->omega[fr_idx] = curr_mapping->omega[fr_idx];//ADDED		//(!)
     }
 }
 
