@@ -474,12 +474,12 @@ void overall_compute_smap(alignments *align, clust_params *clustering, traj *Tra
     double **Z;
     mapping->smap = 0.0;
     int k;
-    if (clustering->crit != 1) {
+    if (clustering->crit != 3) {
         Z = d2t(Trajectory->frames - 1, 4);
         // linkage matrix
         hierarchical_clustering(align->rmsd_mat, Trajectory->frames, Trajectory->pairs, mapping->size, Z);
         // observable computation
-        if (clustering->crit == 0) {
+        if (clustering->crit == 0 || clustering->crit == 4) {
             if (verbose == 1) {
                 printf("criterion %d (maxclust): clustering of dist_mat (len %d, %d frames) into %d clusters \n", clustering->crit,
                        Trajectory->pairs, Trajectory->frames, clustering->ncl);
@@ -493,7 +493,7 @@ void overall_compute_smap(alignments *align, clust_params *clustering, traj *Tra
                 for (cl_id = 0; cl_id < Trajectory->frames; cl_id++) { printf("%d ", mapping->clusters[cl_id]); }
                 printf("\n");
             }
-        } else if (clustering->crit == 3) {
+        } else if (clustering->crit == 1) {
             // It means it's distance-based clustering
             if (verbose == 1) {
                 printf("Warning: criterion %d for computing observable, distance-based clustering\nNOT COMPATIBLE WITH Giulini et. al (2020)\n",
@@ -583,4 +583,116 @@ void overall_compute_smap(alignments *align, clust_params *clustering, traj *Tra
         else{mapping->smap = get_kl(Trajectory->frames, clustering->ncl, mapping->clusters, Trajectory->energies);}
     }
     free_d2t(Z);
+}
+
+
+
+
+void clustering_and_smap(traj* Trajectory, cg_mapping* mapping) { //CHANGE ALSO "observables.h"	//(!)
+    /**
+    * routine that calls `get_smap` with the correct parameters
+    *
+    * Parameters
+    * ----------
+    *
+    * `rmsd_mat` : condensed matrix of pairwise RMSDs
+    *
+    * `clustering` : clust_params object
+    *
+    * `Trajectory` : traj object
+    *
+    * `mapping` : cg_mapping object
+    *
+    * `verbose` : tunes the level of verbosity
+    *
+    * `f_out` : output filename
+    */
+
+    int i;
+    int frame1, frame2, idx_spin;
+    double spin1, spin2;
+    int equal_frames = 0;//boolean variable: 0 = false | 1 = true
+    double Smap = 0;
+    double res = 0;
+    double energies_cg[100000];
+
+    //Initialize mapping->clusters, ->idx_cluster, ->omega
+    //and Reset energies_cg
+    for (i = 0; i < Trajectory->frames; i++) {
+        mapping->clusters[i] = 1;
+        mapping->idx_cluster[i] = i;
+        mapping->omega[i] = 1;
+
+        //Trajectory->energies_cg[i] = Trajectory->energies[i];
+        energies_cg[i] = Trajectory->energies[i];
+    }
+
+    //Clustering
+    for (frame1 = 0; frame1 < Trajectory->frames - 1; frame1++) {
+
+        if (mapping->clusters[frame1] == 1) {
+
+            for (frame2 = frame1 + 1; frame2 < Trajectory->frames; frame2++) {
+
+                if (mapping->clusters[frame2] == 1) {
+
+                    	equal_frames = 1; // I start by saying that frame2 is equal to frame1
+
+                  	for (idx_spin = 0; idx_spin < mapping->n_at; idx_spin++) {
+
+                  		if (mapping->mapping[idx_spin] == 1) {//I look only at the spins contained in mapping
+
+                        		spin1 = Trajectory->traj_coords[frame1][idx_spin];
+              	              		spin2 = Trajectory->traj_coords[frame2][idx_spin];
+
+                            		if (spin1 != spin2) {
+                                		equal_frames = 0;//If two of the mapped spins of the 2 frames differ, I retain frame2
+                                		break;
+                            		}
+                      		}
+
+                    	}
+
+                    	if (equal_frames == 1) {
+                        	mapping->clusters[frame2] = 0; //I discard frame2 from the clustered configs
+                        	mapping->idx_cluster[frame2] = frame1; //I save the index of the cluster where frame2 belongs
+                        	mapping->omega[frame2] = 0;
+                        	mapping->omega[frame1] = mapping->omega[frame1] + 1;
+                        
+                        	//Trajectory->energies_cg[frame1] = Trajectory->energies_cg[frame1] + Trajectory->energies[frame2];//I add p_phi(frame2) to P_Phi(frame1)
+                        	energies_cg[frame1] = energies_cg[frame1] + Trajectory->energies[frame2];//I add p_phi(frame2) to P_Phi(frame1)
+
+                    	}
+		   
+                }
+
+            }
+        }
+    }
+
+    double p_bar, p_phi, p_Phi;
+    int idx_Phi;
+
+    //S_map
+    for (i = 0; i < Trajectory->frames; i++) {
+        p_phi = Trajectory->energies[i];
+
+        idx_Phi = mapping->idx_cluster[i];
+        //p_bar = (double)Trajectory->energies_cg[idx_Phi] / (double)mapping->omega[idx_Phi];
+        p_bar = (double)energies_cg[idx_Phi] / (double)mapping->omega[idx_Phi];
+        p_Phi = energies_cg[idx_Phi];
+
+        Smap = Smap + p_phi * log(p_phi / p_bar);
+        res = res - p_bar * log(p_Phi);             //resolution
+    }
+
+    
+
+    mapping->smap = Smap;
+    mapping->res = res;
+    //MINIMUM RESOLUTION SEARCH						//(!)
+    //mapping->smap = res;						//(!)
+    
+    printf("\n\nRes = %f", mapping->res);
+    
 }
