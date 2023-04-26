@@ -15,6 +15,7 @@ typedef struct traj{
     int frames;             /*!< number of frames in the trajectory */
     double **traj_coords;   /*!< 2D array of xyz coordinates */
     double *energies;       /*!< 1D array of energies. One value per frame. */
+    double *energies_cg;    /*!< 1D array of CG energies. One value per frame. */  	//(!)
     int n_at;               /*!< number of atoms in the atomistic structure */
     int pairs;              /*!< number of possible pairs of structures */
     int *strides;           /*!< vector of configurations to consider (criterion 3)*/
