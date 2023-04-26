@@ -30,5 +30,7 @@ double get_smap(int frames, int curr_nclust, int *clusters, double *energies);
 
 void overall_compute_smap(alignments *align, clust_params *clustering, traj *Trajectory, cg_mapping *mapping, int verbose, int kl_flag);
 
+void clustering_and_smap(traj* Trajectory, cg_mapping* mapping);//(!)
+
 
 #endif
