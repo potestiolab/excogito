@@ -170,7 +170,7 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
 
     /* Initialize the 2D-array Trajectory->traj_coords[][] */
     for(i = 0; i < Trajectory->frames; i++){
-        for(j = 0; j < Trajectory->n_at + 1; j++){
+        for(j = 0; j < Trajectory->n_at; j++){
             Trajectory->traj_coords[i][j] = 0.0;					//(!)
             /*Trajectory->traj_coords[i][3 * j + 0] = 0.0;
             Trajectory->traj_coords[i][3 * j + 1] = 0.0;
@@ -185,7 +185,6 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
 
     frame_idx = 0;                                      // Initialize frame index to  0 
     p  = 0;                                             // Initialize counter "p" to 0 
-    float sum = 0;    
 
     for(i=0; i<rows_i; i++){
         if(p>=Trajectory->n_at)                       // p increases from 0 to 3*atomnum i.e. p=[0;3*230) i.e. p = [0;689] //(!)
@@ -213,10 +212,6 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
                 } 
                 else{
                     frame_idx++;
-		    if (i > 0) { //Saving the sum of all spins value for the frame [frame_idx - 2]
-                        Trajectory->traj_coords[frame_idx - 2][Trajectory->n_at] = sum;
-                        sum = 0;
-                    }
                     if(frame_idx>Trajectory->frames){
                         fe = fopen("error.dat", "w");
                         fprintf(fe, "Error. The number of trajectory frames is higher than the declared one in parameter file (%d).\nAborting\n", Trajectory->frames);
@@ -264,7 +259,6 @@ void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
                     for (j = 1; j <= count - 1; j++) {
                         //check_float_string(token_arr[j], i, TrajFileName);                     // Checking that each row is an FLOAT number.		//(!)
                         Trajectory->traj_coords[frame_idx - 1][p] = atof(token_arr[j]);          // Assigning each float-string to traj_coords[i][j] 2D-array 
-			sum += Trajectory->traj_coords[frame_idx - 1][p];
                         p++;
                     }
 
