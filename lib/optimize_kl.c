@@ -33,7 +33,7 @@ void optimize_kl(arguments *arguments, parameters *cc){
     traj *Trajectory = malloc (sizeof(traj));
     Trajectory->frames = cc->frames;
     Trajectory->n_at = cc->atomnum;
-    Trajectory->traj_coords = d2t(cc->frames, 1 * cc->atomnum + 1);			//(!)
+    Trajectory->traj_coords = d2t(cc->frames, 1 * cc->atomnum);			//(!)
     Trajectory->energies = d1t(cc->frames);
     Trajectory->energies_cg = d1t(cc->frames); 						//(!)
     Trajectory->stride = cc->stride;
