@@ -32,6 +32,7 @@
 #include <measure_kl.h>
 #include <optimize_kl.h>
 #include <random_mapping_kl.h>
+#include <optimize_spins.h>                                                                                                                         //(!) ADDED
 
 int main(int argc, char *argv[]) {
     /**
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
     time_t seconds;
     time_t seconds_ref = time(NULL);
 
-    char * tasks [] = {"optimize", "optimize_kl", "random","random_kl","measure","measure_kl", "norm", "cosine", "distance"};
+    char * tasks [] = {"optimize", "optimize_kl", "random","random_kl","measure","measure_kl", "norm", "cosine", "distance", "optimize_spins"};   //(!) MODIFIED
     int n_tasks = sizeof(tasks)/sizeof(tasks[0]);
 
     arguments *args = malloc(sizeof(arguments));
@@ -140,6 +141,9 @@ int main(int argc, char *argv[]) {
     if (strcmp(args->task , "distance") == 0){
         distance(args, cc);
     }
+    if (strcmp(args->task, "optimize_spins") == 0) {                    //(!) ADDED
+        optimize_spins(args, cc);
+    }  
     free(args);
     free(cc);
     seconds = time(NULL);
