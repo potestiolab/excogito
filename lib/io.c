@@ -966,6 +966,12 @@ void mandatory_files_present(arguments *arguments, char *argv[]){
         n_pars = sizeof(pars)/sizeof(pars[0]);
         check_files(pars,pars_names,n_pars,argv);
     }
+    else if (strcmp(arguments->task, "optimize_spins") == 0) {                                                                              //(!) ADDED
+        char* pars[] = { arguments->parameter_file, arguments->trajectory_file, arguments->probability_file };
+        char* pars_names[] = { "parameter file", "trajectory file", "probability file" };
+        n_pars = sizeof(pars) / sizeof(pars[0]);
+        check_files(pars, pars_names, n_pars, argv);
+    }      
 
 }
 
@@ -1096,6 +1102,17 @@ void read_ParameterFile(arguments *arguments, parameters *cc){
         n_pars = sizeof(pars)/sizeof(pars[0]);
         check_parameters(pars, pars_names, n_pars);
         check_optional_parameters(cc);
+    }
+    else if (strcmp(arguments->task, "optimize_spins") == 0) {                                                  //(!) ADDED
+        int pars[] = { cc->Flag_atomnum, cc->Flag_frames, cc->Flag_cgnum, cc->Flag_MC_steps };
+        char* pars_names[] = { "atomnum", "frames", "cgnum", "MC_steps" };
+        n_pars = sizeof(pars) / sizeof(pars[0]);
+        cc->criterion = 0;
+        cc->Flag_criterion = 1;
+        cc->nclust = 3;
+        cc->Flag_nclust = 1;
+        check_parameters(pars, pars_names, n_pars);
+        check_optional_parameters(cc);                                                                          //TO HERE
     }
     fclose(fp);
 }
