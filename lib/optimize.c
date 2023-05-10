@@ -37,8 +37,8 @@ void optimize(arguments *arguments, parameters *cc){
     Trajectory->traj_coords = d2t(cc->frames, 3 * cc->atomnum);
     Trajectory->energies = d1t(cc->frames);
     Trajectory->stride = cc->stride;
-    if (clustering->crit == 3){
-        printf("criterion = 3\n");
+    if (clustering->crit == 1){
+        printf("criterion = %d\n", clustering->crit);
         printf("cc->frames/cc->stride = %d\n",cc->frames/cc->stride);
         if ((Trajectory->frames-1)%Trajectory->stride == 0){
             Trajectory->eff_frames = cc->frames/cc->stride + 1;
@@ -100,7 +100,7 @@ void optimize(arguments *arguments, parameters *cc){
                     sprintf(out_filename, "./%s_fast_delta_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
                     FILE *f_out_l;
                     f_out_l = open_file_w(out_filename);
-                    //tzeros[q] = tzero_estimation(Trajectory, clustering, cc->cgnum, cc->rsd, arguments->verbose, 0, f_out_l);     //(!) ELIMINATE because we change it for optimize_kl
+                    tzeros[q] = tzero_estimation(Trajectory, clustering, cc->cgnum, cc->rsd, arguments->verbose, 0, f_out_l);   
                     fprintf(f_out_l, "t_zero[%d] estimation concluded: starting temperature for simulated annealing = %8.6lf", q, tzeros[q]);
                     fclose(f_out_l);
                 }
@@ -131,7 +131,7 @@ void optimize(arguments *arguments, parameters *cc){
                 else{SA_params->decay_time = cc->decay_time;}
                 SA_params->rotmats_period = cc->rotmats_period;
                 printf("rsd = %d\n", cc->rsd);
-                //simulated_annealing(Trajectory, clustering, SA_params, cc->cgnum, cc->rsd, arguments->verbose, 0, f_out_l);   //(!) ELIMINATE because we change it for optimize_kl
+                simulated_annealing(Trajectory, clustering, SA_params, cc->cgnum, cc->rsd, arguments->verbose, 0, f_out_l);  
                 fclose(f_out_l);
                 // free SA_params
                 free(SA_params);
@@ -143,7 +143,7 @@ void optimize(arguments *arguments, parameters *cc){
         // free trajectory
         free_d2t(Trajectory->traj_coords);
         free_d1t(Trajectory->energies);
-        if (clustering->crit == 3){free_i1t(Trajectory->strides);}
+        if (clustering->crit == 1){free_i1t(Trajectory->strides);}
         free(Trajectory);
         // free clustering
         free(clustering);
