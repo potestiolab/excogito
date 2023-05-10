@@ -23,6 +23,7 @@ void optimize_kl(arguments *arguments, parameters *cc){
     FILE *fe; // declaration of error file 
     printf("subprogram optimize_kl\n");  
     char out_filename[1000];
+    int spins = 0;
     // clustering
     clust_params *clustering = malloc (sizeof(clust_params));
     clustering->crit = cc->criterion;
@@ -46,7 +47,7 @@ void optimize_kl(arguments *arguments, parameters *cc){
     int nthreads, tid;
     // read files
     printf("reading trajectory\n");
-    read_TrajectoryFile(arguments->trajectory_file, Trajectory);			//(!)
+    read_TrajectoryFile(arguments->trajectory_file, Trajectory, spins);                                             //(!) MODIFIED
     printf("reading probabilities\n");
     read_EnergyFile(arguments->probability_file, Trajectory);				//(!)
     int i;
