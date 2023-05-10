@@ -28,6 +28,7 @@ void distance(arguments *arguments, parameters *cc){
         exit(EXIT_FAILURE);
     }
     char out_filename[200];
+    int spins = 0;
     traj *Trajectory = malloc (sizeof(traj));
     Trajectory->frames = cc->frames;
     Trajectory->n_at = cc->atomnum;
@@ -38,7 +39,7 @@ void distance(arguments *arguments, parameters *cc){
     printf("overall pairs = %d\n", Trajectory->pairs);
     // read trajectory
     printf("reading trajectory\n");
-    read_TrajectoryFile(arguments->trajectory_file, Trajectory);
+    read_TrajectoryFile(arguments->trajectory_file, Trajectory, spins);
     printf("distance matrix calculation for %d mappings\n", cc->n_mappings);
     sprintf(out_filename, "./%s_distmat_N%d.dat", arguments->prot_code, cc->cgnum);
     FILE *f_out_l;
