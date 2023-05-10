@@ -18,11 +18,11 @@ typedef struct MC_params{
 
 void my_make_a_move(cg_mapping *old_mapping, cg_mapping *new_mapping, int rem_add[2]);
 
-void simulated_annealing(traj *Trajectory, MC_params *SA_params, int cgnum, int rsd, int verbose, int kl_flag, FILE *f_out_l, int core);	//(!)
+void simulated_annealing(traj *Trajectory, clust_params *clustering, MC_params *SA_params, int cgnum, int rsd, int verbose, int kl_flag, FILE *f_out_l, int core);	//(!)
 
 void simulated_annealing_spins(traj* Trajectory, MC_params* SA_params, int cgnum, int rsd, int verbose, int kl_flag, FILE* f_out_l, int core);  //(!) ADDED
 
-double tzero_estimation(traj *Trajectory, int cgnum, int rsd, int verbose, int kl_flag, FILE *f_out_l);	//(!)
+double tzero_estimation(traj *Trajectory, clust_params *clustering, int cgnum, int rsd, int verbose, int kl_flag, FILE *f_out_l);	//(!)
 
 double tzero_estimation_spins(traj *Trajectory, int cgnum, int rsd, int verbose, int kl_flag, FILE *f_out_l);	//(!) ADDED
 
