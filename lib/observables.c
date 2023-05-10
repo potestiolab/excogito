@@ -585,49 +585,20 @@ void overall_compute_smap(alignments *align, clust_params *clustering, traj *Tra
     free_d2t(Z);
 }
 
+void clustering_spins(traj* Trajectory, cg_mapping* mapping, double* energies_cg) {                                                     //(!) ADDED COMPLETELY
+    /*
+    Function that cluster together all configurations that, looking only at the spins retained by the mapping,
+    present identical spin states. 
 
-
-
-void clustering_and_smap(traj* Trajectory, cg_mapping* mapping) { //CHANGE ALSO "observables.h"	//(!)
-    /**
-    * routine that calls `get_smap` with the correct parameters
-    *
-    * Parameters
-    * ----------
-    *
-    * `rmsd_mat` : condensed matrix of pairwise RMSDs
-    *
-    * `clustering` : clust_params object
-    *
-    * `Trajectory` : traj object
-    *
-    * `mapping` : cg_mapping object
-    *
-    * `verbose` : tunes the level of verbosity
-    *
-    * `f_out` : output filename
+    Moreover, this function calculates:
+    - the mapped probability distribution and store it in "energies_cg"
+    - omega_1, i.e. the number of fine-grain configuration that maps in the same CG representation, and store it in "mapping->omega"
     */
 
-    int i;
     int frame1, frame2, idx_spin;
     double spin1, spin2;
     int equal_frames = 0;//boolean variable: 0 = false | 1 = true
-    double Smap = 0;
-    double res = 0;
-    double energies_cg[100000];
 
-    //Initialize mapping->clusters, ->idx_cluster, ->omega
-    //and Reset energies_cg
-    for (i = 0; i < Trajectory->frames; i++) {
-        mapping->clusters[i] = 1;
-        mapping->idx_cluster[i] = i;
-        mapping->omega[i] = 1;
-
-        //Trajectory->energies_cg[i] = Trajectory->energies[i];
-        energies_cg[i] = Trajectory->energies[i];
-    }
-
-    //Clustering
     for (frame1 = 0; frame1 < Trajectory->frames - 1; frame1++) {
 
         if (mapping->clusters[frame1] == 1) {
@@ -636,63 +607,88 @@ void clustering_and_smap(traj* Trajectory, cg_mapping* mapping) { //CHANGE ALSO 
 
                 if (mapping->clusters[frame2] == 1) {
 
-                    	equal_frames = 1; // I start by saying that frame2 is equal to frame1
+                    equal_frames = 1; // I start by saying that frame2 is equal to frame1
 
-                  	for (idx_spin = 0; idx_spin < mapping->n_at; idx_spin++) {
+                    for (idx_spin = 0; idx_spin < mapping->n_at; idx_spin++) {
 
-                  		if (mapping->mapping[idx_spin] == 1) {//I look only at the spins contained in mapping
+                        if (mapping->mapping[idx_spin] == 1) {//I look only at the spins contained in mapping
 
-                        		spin1 = Trajectory->traj_coords[frame1][idx_spin];
-              	              		spin2 = Trajectory->traj_coords[frame2][idx_spin];
+                            spin1 = Trajectory->traj_coords[frame1][idx_spin];
+                            spin2 = Trajectory->traj_coords[frame2][idx_spin];
 
-                            		if (spin1 != spin2) {
-                                		equal_frames = 0;//If two of the mapped spins of the 2 frames differ, I retain frame2
-                                		break;
-                            		}
-                      		}
+                            if (spin1 != spin2) {
+                                equal_frames = 0;//If two of the mapped spins of the 2 frames differ, I retain frame2
+                                break;
+                            }
+                        }
 
-                    	}
+                    }
 
-                    	if (equal_frames == 1) {
-                        	mapping->clusters[frame2] = 0; //I discard frame2 from the clustered configs
-                        	mapping->idx_cluster[frame2] = frame1; //I save the index of the cluster where frame2 belongs
-                        	mapping->omega[frame2] = 0;
-                        	mapping->omega[frame1] = mapping->omega[frame1] + 1;
-                        
-                        	//Trajectory->energies_cg[frame1] = Trajectory->energies_cg[frame1] + Trajectory->energies[frame2];//I add p_phi(frame2) to P_Phi(frame1)
-                        	energies_cg[frame1] = energies_cg[frame1] + Trajectory->energies[frame2];//I add p_phi(frame2) to P_Phi(frame1)
+                    if (equal_frames == 1) {
+                        mapping->clusters[frame2] = 0; //I discard frame2 from the clustered configs
+                        mapping->idx_cluster[frame2] = frame1; //I save the index of the cluster where frame2 belongs
+                        mapping->omega[frame2] = 0;
+                        mapping->omega[frame1] = mapping->omega[frame1] + 1;
 
-                    	}
-		   
+                        energies_cg[frame1] = energies_cg[frame1] + Trajectory->energies[frame2];//I add p_phi(frame2) to P_Phi(frame1)
+
+                    }
+
                 }
 
             }
         }
     }
+}
+
+double smap_spins(traj* Trajectory, cg_mapping* mapping, double* energies_cg) {
+    /*
+    Function that calculates the mapping entropy for a spin system.
+    */
 
     double p_bar, p_phi, p_Phi;
     int idx_Phi;
+    int i = 0;
+    double Smap = 0;
 
-    //S_map
     for (i = 0; i < Trajectory->frames; i++) {
         p_phi = Trajectory->energies[i];
 
         idx_Phi = mapping->idx_cluster[i];
-        //p_bar = (double)Trajectory->energies_cg[idx_Phi] / (double)mapping->omega[idx_Phi];
         p_bar = (double)energies_cg[idx_Phi] / (double)mapping->omega[idx_Phi];
         p_Phi = energies_cg[idx_Phi];
 
         Smap = Smap + p_phi * log(p_phi / p_bar);
-        res = res - p_bar * log(p_Phi);             //resolution
     }
 
-    
+    return Smap;
+}
 
-    mapping->smap = Smap;
-    mapping->res = res;
-    //MINIMUM RESOLUTION SEARCH						//(!)
-    //mapping->smap = res;						//(!)
-    
-    printf("\n\nRes = %f", mapping->res);
-    
+void clustering_and_smap(traj* Trajectory, cg_mapping* mapping) { //CHANGE ALSO "observables.h"	//(!)
+    /**
+    Function that perform the clustering of the configurations of a spin system for a given mapping
+    and calculates the related mapping entropy
+    */
+
+    int i;
+    double Smap = 0;
+    double energies_cg[100000];
+    double p_bar, p_phi, p_Phi;
+    int idx_Phi;
+
+    //Initialize mapping->clusters, ->idx_cluster, ->omega
+    //and Reset energies_cg
+    for (i = 0; i < Trajectory->frames; i++) {
+        mapping->clusters[i] = 1;
+        mapping->idx_cluster[i] = i;
+        mapping->omega[i] = 1;
+
+        energies_cg[i] = Trajectory->energies[i];
+    }
+
+    //cluster all the configurations with equal mapped spins
+    clustering_spins(Trajectory, mapping, &energies_cg[0]);
+
+    //calculating mapping entropy relative to "mapping"
+    mapping->smap = smap_spins(Trajectory, mapping, energies_cg);
 }
