@@ -28,6 +28,7 @@ void cosine(arguments *arguments, parameters *cc){
         exit(EXIT_FAILURE);
     }
     char out_filename[1000];
+    int spins = 0;
     traj *Trajectory = malloc (sizeof(traj));
     Trajectory->frames = cc->frames;
     Trajectory->n_at = cc->atomnum;
@@ -39,7 +40,7 @@ void cosine(arguments *arguments, parameters *cc){
     printf("overall pairs = %d\n", Trajectory->pairs);
     // read trajectory
     printf("reading trajectory\n");
-    read_TrajectoryFile(arguments->trajectory_file, Trajectory);
+    read_TrajectoryFile(arguments->trajectory_file, Trajectory, spins);                                                     //(!) MODIFIED
     cg_mapping *mapping = malloc (sizeof(cg_mapping));
     mapping->n_at = cc->atomnum;
     mapping->n_cg = cc->cgnum;
