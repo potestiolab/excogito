@@ -14,7 +14,6 @@ typedef struct cg_mapping{
     int *idx_cluster;    /*!< 1D array of indices that tells you in what cluster the config belongs. */           //(!)
     int *omega;     /*!< 1D array of omega_1. */        				//(!)  
     double smap;    /*!< value of mapping entropy */
-    double res;     /*!< value of resolution */
     int *clusters;  /*!< array CG macrostates */
     int *size;      /*!< sizes of CG macrostates */
     double *norms;  /*!< moduli of CG mapping over the trajectory */
