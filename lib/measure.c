@@ -31,6 +31,7 @@ void measure(arguments *arguments, parameters *cc){
         exit(EXIT_FAILURE);
     }
     char out_filename[1000];
+    int spins = 0;
     // clustering
     clust_params *clustering = malloc (sizeof(clust_params));
     clustering->crit = cc->criterion;
@@ -74,7 +75,7 @@ void measure(arguments *arguments, parameters *cc){
     int nthreads, tid;
     // read trajectory
     printf("reading trajectory\n");
-    read_TrajectoryFile(arguments->trajectory_file, Trajectory);
+    read_TrajectoryFile(arguments->trajectory_file, Trajectory, spins);                                                             //(!) MODIFIED
     printf("reading energies\n");
     read_EnergyFile(arguments->energy_file, Trajectory);
     // declaring variables
