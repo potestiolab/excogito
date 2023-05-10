@@ -34,12 +34,33 @@ void optimize_kl(arguments *arguments, parameters *cc){
     traj *Trajectory = malloc (sizeof(traj));
     Trajectory->frames = cc->frames;
     Trajectory->n_at = cc->atomnum;
-    Trajectory->traj_coords = d2t(cc->frames, 1 * cc->atomnum);			//(!)
+    Trajectory->traj_coords = d2t(cc->frames, 3 * cc->atomnum);			//(!)
     Trajectory->energies = d1t(cc->frames);
     Trajectory->energies_cg = d1t(cc->frames); 						//(!)
     Trajectory->stride = cc->stride;
     
-    Trajectory->pairs = cc->frames * (cc->frames - 1) / 2;
+    if (clustering->crit == 1){
+        printf("criterion = %d\n", clustering->crit);
+        printf("cc->frames/cc->stride = %d\n",cc->frames/cc->stride);
+        if ((Trajectory->frames-1)%Trajectory->stride == 0){
+            Trajectory->eff_frames = cc->frames/cc->stride + 1;
+        }
+        else{
+            Trajectory->eff_frames = (cc->frames-1)/cc->stride + 2;
+        }
+        printf("effective frames = %d\n", Trajectory->eff_frames);
+        Trajectory->pairs = Trajectory->eff_frames * (Trajectory->eff_frames - 1)/ 2;
+        Trajectory->strides = i1t(cc->frames);
+        int idx = 0;
+        for (idx = 0; idx < cc->frames; idx++){
+            if (idx%cc->stride == 0) {Trajectory->strides[idx] = 1;}
+            else{Trajectory->strides[idx] = 0;}
+        }
+        Trajectory->strides[cc->frames-1] = 1;
+        printf("strides\n");
+        for (idx = 0; idx < cc->frames; idx++){printf("%d ", Trajectory->strides[idx]);}
+    }
+    else{Trajectory->pairs = cc->frames * (cc->frames - 1) / 2;}
     printf("frames = %d\n", Trajectory->frames);
     // computing parameters and allocating objects
     printf("overall pairs = %d\n", Trajectory->pairs);
@@ -49,7 +70,7 @@ void optimize_kl(arguments *arguments, parameters *cc){
     printf("reading trajectory\n");
     read_TrajectoryFile(arguments->trajectory_file, Trajectory, spins);                                             //(!) MODIFIED
     printf("reading probabilities\n");
-    read_EnergyFile(arguments->probability_file, Trajectory);				//(!)
+    read_EnergyFile(arguments->probability_file, Trajectory);
     int i;
     int isprob = check_probabilities(Trajectory->energies, Trajectory->frames);
     if (isprob != 1){
@@ -87,10 +108,10 @@ void optimize_kl(arguments *arguments, parameters *cc){
             {
             #pragma omp for schedule(static, 1)
                 for (q = 0; q < nthreads; q++) {
-                    sprintf(out_filename, "./OUTPUT_FILES/%skl_fast_delta_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
+                    sprintf(out_filename, "./%skl_fast_delta_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
                     FILE *f_out_l;
                     f_out_l = open_file_w(out_filename);
-                    tzeros[q] = tzero_estimation(Trajectory, cc->cgnum, cc->rsd, arguments->verbose, 1, f_out_l);
+                    tzeros[q] = tzero_estimation(Trajectory, clustering, cc->cgnum, cc->rsd, arguments->verbose, 1, f_out_l);
                     fprintf(f_out_l, "t_zero[%d] estimation concluded: starting temperature for simulated annealing = %8.6lf", q, tzeros[q]);
                     fclose(f_out_l);
                 }
@@ -107,12 +128,11 @@ void optimize_kl(arguments *arguments, parameters *cc){
         {
 #pragma omp for schedule(static, 1)
             for (q = 0; q < nthreads; q++) {
-                sprintf(out_filename, "./OUTPUT_FILES/%skl_SA_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
+                sprintf(out_filename, "./%skl_SA_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); 
                 FILE *f_out_l;
                 f_out_l = open_file_w(out_filename);
                 MC_params *SA_params = malloc (sizeof(MC_params));
-                SA_params->t_zero = cc->t_zero;					//(!)
-		//SA_params->t_zero = 0.2;					//(!)
+                SA_params->t_zero = cc->t_zero;					
                 SA_params->MC_steps = cc->MC_steps;
                 if (cc->Flag_decay_time != 1){
                     double d_decay_time = -SA_params->MC_steps*1.0/log(0.001); // so that to have 1/1000 of the start temperature at the end. TODO: convert to float
@@ -122,7 +142,7 @@ void optimize_kl(arguments *arguments, parameters *cc){
                 else{SA_params->decay_time = cc->decay_time;}
                 SA_params->rotmats_period = cc->rotmats_period;
                 printf("rsd = %d\n", cc->rsd);
-                simulated_annealing(Trajectory, SA_params, cc->cgnum, cc->rsd, arguments->verbose, 1, f_out_l, q);
+                simulated_annealing(Trajectory, clustering, SA_params, cc->cgnum, cc->rsd, arguments->verbose, 1, f_out_l, q);
                 fclose(f_out_l);
                 // free SA_params
                 free(SA_params);
@@ -136,6 +156,8 @@ void optimize_kl(arguments *arguments, parameters *cc){
         // free trajectory
         free_d2t(Trajectory->traj_coords);
         free_d1t(Trajectory->energies);
+        if (clustering->crit == 1){free_i1t(Trajectory->strides);}
         free(Trajectory);
+        // free clustering
         free(clustering);
 }
