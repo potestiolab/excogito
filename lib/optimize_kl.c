@@ -142,7 +142,7 @@ void optimize_kl(arguments *arguments, parameters *cc){
                 else{SA_params->decay_time = cc->decay_time;}
                 SA_params->rotmats_period = cc->rotmats_period;
                 printf("rsd = %d\n", cc->rsd);
-                simulated_annealing(Trajectory, clustering, SA_params, cc->cgnum, cc->rsd, arguments->verbose, 1, f_out_l, q);
+                simulated_annealing(Trajectory, clustering, SA_params, cc->cgnum, cc->rsd, arguments->verbose, 1, f_out_l);
                 fclose(f_out_l);
                 // free SA_params
                 free(SA_params);
