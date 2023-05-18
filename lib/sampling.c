@@ -442,11 +442,6 @@ void simulated_annealing_spins(traj* Trajectory, MC_params* SA_params, int cgnum
 
     char out_filename[1000];
 
-    sprintf(out_filename, "./MC_CONVERGENCE/MC_converge_N%d_Ncg%d_MC%d_c%d.csv", Trajectory->n_at, cgnum, SA_params->MC_steps, core);
-    FILE* f_smap_mc;
-    f_smap_mc = open_file_w(out_filename);
-    fprintf(f_smap_mc, "Smap\n");
-
     cg_mapping* mapping = malloc(sizeof(cg_mapping));
     cg_mapping* new_mapping = malloc(sizeof(cg_mapping));
     cg_mapping* lowest_mapping = malloc(sizeof(cg_mapping));
@@ -543,8 +538,6 @@ void simulated_annealing_spins(traj* Trajectory, MC_params* SA_params, int cgnum
             printf("MC step number: %d\n", mc);
             printf("time elapsed: %ld seconds\n", seconds - seconds_ref);
         }
-
-        fprintf(f_smap_mc, "%lf\n", lowest_mapping->smap);			//(!)
     }
     fprintf(f_out_l, "END OF SIMULATED ANNEALING OPTIMISATION\n");
     fprintf(f_out_l, "lowest_smap = %lf\n", lowest_mapping->smap);
