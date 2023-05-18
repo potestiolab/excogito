@@ -91,12 +91,6 @@ void read_EnergyFile(char *EnergyFileName, traj *Trajectory){
 
         /* Checking for not-empty rows, only one column per row, each row is only FLOAT. Assign each float-string to energy[i] array */
         //string = (char*) malloc (rows_i);                                // Allocate char string 
-	
-	char out_filename[100];
-        sprintf(out_filename, "./RESULTS/Probabilities_read.csv");
-        FILE* f_prob;
-        f_prob = open_file_w(out_filename);
-
 
         for(i=0; i<rows_i; i++) {
 
