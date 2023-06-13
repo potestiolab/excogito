@@ -394,11 +394,13 @@ Inside the directory examples there are example files for the *6d93* protein, al
 
 - **distance**: ```./build/excogito distance -p examples/parameters/parameters_distance_6d93_N31.ini -t ./examples/trajectories/6d93_1frame.xyz -x examples/mappings/6d93_mapping_matrix.txt -c 6d93```
 
-- **optimize**: ``` ./build/excogito optimize_kl -p examples/parameters/parameters_optimizekl_6d93_N31_notemp.ini -t examples/trajectories/6d93_100frames.xyz -r examples/probabilities/6d93_probs_100frames.txt -c 6d93 ```
+- **optimize_kl**: ``` ./build/excogito optimize_kl -p examples/parameters/parameters_optimizekl_6d93_N31_notemp.ini -t examples/trajectories/6d93_100frames.xyz -r examples/probabilities/6d93_probs_100frames.txt -c 6d93 ```
 
 - **random_kl**: ```./build/excogito random_kl -p examples/parameters/parameters_randomkl_6d93_N31.ini -t examples/trajectories/6d93_100frames.xyz -r examples/probabilities/6d93_probs_100frames.txt -c 6d93```
 
 - **measure_kl**: ```./build/excogito measure_kl -p examples/parameters/parameters_measurekl_6d93_N31.ini -t examples/trajectories/6d93_100frames.xyz -r examples/probabilities/6d93_probs_100frames.txt -c 6d93 -m examples/mappings/tamapin_ca_mapping.txt```
+
+- **optimize_spins**: ``` ./build/excogito optimize_spins -p examples/parameters/parameters_optimize_spins.ini -t examples/trajectories/trajectory_optimize_spins.xyz -r examples/probabilities/probabilities_optimize_spins.txt -c OS_ ```
 
 # 5. Scaling values #
 
