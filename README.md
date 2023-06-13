@@ -72,6 +72,7 @@ The typical usage of the program consists in a call to *excogito* with one of th
 - **optimize_kl**: to optimize the coarse-grained mapping by minimising its mapping entropy, calculated using the original Kullback-Leibler divergence;
 - **random_kl**: to randomly generate coarse-grained representations and measure the associated mapping entropies, calculated using the original Kullback-Leibler divergence;
 - **measure_kl**: to measure the mapping entropy of a mapping provided by the user (in the form of a .txt file), calculated using the original Kullback-Leibler divergence.
+- **optimize_spins**: to optimize the coarse-grained mapping of a spin model by minimising its mapping entropy, calculated using the original Kullback-Leibler divergence;
 
 Each task can require different input files, which are provided to the program in the form of command-line options. 
 
@@ -229,6 +230,20 @@ or
 
 For further information, please type on terminal ```./excogito measure_kl```
 
+## 2.10. Optimize_spins Task ##
+
+The **optimize_spins** task requires three input files: _parameter_, _trajectory_, and _probability_. 
+
+In order to launch the **optimize_spins** task follow this syntax: 
+
+```bash 
+./excogito optimize_spins -p $parameter_file.ini -t $trajectory_file.xyz -r $probability_file.txt -c $prot_code
+
+or
+
+./excogito optimize_spins --p $parameter_file.ini --t $trajectory_file.xyz --probs $probability_file.txt --code $prot_code
+```
+
 
 # 3. Which arguments are mandatory? A short explanation #
 
@@ -261,18 +276,18 @@ There exist 16 parameters, but only few of them are mandatory for the selected t
 | criterion | criterion for clustering | int | O-R-M |  0, 1, 2, 3|
 | nclust | number of CG macrostates | int | C0 - C3 | between frames/500, and frames/100|
 | n_mappings | number of mappings in tasks **random** and **distance** | int | R-D | | 
-| MC_steps | number of MC step in task **optimize** | int | O |  > 5000|
+| MC_steps | number of MC step in task **optimize** | int | O-OS |  > 5000|
 | rotmats_period | MC steps between two full alignments in task **optimize** | int | O | |
 | t_zero | starting temperature in task **optimize** | double | O | |
 | distance |  cophenetic distance threshold | double | C3 | |
 | max_nclust | upper number of clusters | int | C2 | between frames/100 and frames/50|
 | min_nclust | lower number of clusters | int | C2 | between frames/1000 and frames/500 (must be < max\_nclust)|
 | Ncores | number of cores | int | no | |
-| decay_time | governs temperature decay in task **optimize** | double | O | |
+| decay_time | governs temperature decay in task **optimize** | double | O-OS | |
 | rsd | use rsd (if 1) instead of rmsd (if 0) | int | no | |
 | stride | number of structures between two pivot configurations | int | C1 | ~ 10 if frames between 1000 and 10000|
 
-O-R-M-D refer to the tasks (optimize/optimize_kl, random/random_kl, measure/measure_kl, distance) in which the parameter is mandatory. C0 .. C3 indicates that the parameter is mandatory if the clustering criterion is equal to 0 .. 3, respectively.
+O-R-M-D-OS refer to the tasks (optimize/optimize_kl, random/random_kl, measure/measure_kl, distance, optimize_spins) in which the parameter is mandatory. C0 .. C3 indicates that the parameter is mandatory if the clustering criterion is equal to 0 .. 3, respectively.
 
 ## Clustering
 
