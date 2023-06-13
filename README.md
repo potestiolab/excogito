@@ -315,6 +315,22 @@ X   2.80  1.91   3.43
 X   2.67  2.03   3.28
 ```
 
+The "optimize_spins" option is an exception and, since it is used for spin systems analysis, it requires a different trjectory file. This file must be similar to the previously described one but it only needs one coordinate per spin, that corresponds to its state +1 or -1.
+As an example, a trajectory with 2 frames and 3 spins should resemble the following string:
+
+```
+3
+
+X   1
+X   1
+X   -1
+3
+
+X   -1
+X   1
+X   -1
+```
+
 In the *python* subdirectory there is a script that helps with the conversion from GROMACS XTC to the XYZ format.
 
 ## 3.3. Energy FILE ##
