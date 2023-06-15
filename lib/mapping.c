@@ -2,7 +2,6 @@
 * \class cg_mapping_lib
 * \brief library of functions that perform simple operations on CG mappings 
 */
-//ciao
 #include <stdio.h>
 #include <stdlib.h>
 #include <mapping.h>
