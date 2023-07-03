@@ -169,9 +169,9 @@ double optimal_alignment(double **x, double **y, int cgnum, double u[][3]) {
     if (e < 0.0) {
         if (fabs(e) < 1.0e-3) {
             if (speak == 1) {
-                printf("Warning. In Kabsch alignment found slightly negative value of e (%e). Roundoff error? I will set it equal to zero.\n",
+                printf("Warning. In Kabsch alignment found slightly negative value of e (%e). Identical structures? Setting it to 0.000001.\n",
                        e);
-                e = 0.0;
+                e = 0.000001;
             }
         }
             /* occasionally, when dealing with two practically identical configurations
