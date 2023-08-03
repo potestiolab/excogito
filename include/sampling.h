@@ -22,4 +22,6 @@ void simulated_annealing(traj *Trajectory, clust_params *clustering, MC_params *
 
 double tzero_estimation(traj *Trajectory, clust_params *clustering, int cgnum, int rsd, int verbose, int kl_flag, FILE *f_out_l);
 
+double tzero_estimation_spins(spin_traj *Trajectory, int cgnum, FILE *f_out_l);
+
 #endif
