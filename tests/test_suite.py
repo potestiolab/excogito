@@ -688,7 +688,7 @@ class test26(unittest.TestCase):
 
 class test27(unittest.TestCase):
     """
-    class that checks the correct functioning of task random_kl
+    class that checks the correct functioning of task optimize_spins
     """
     def test27_output_exist(self):
         """check existence of output files"""
