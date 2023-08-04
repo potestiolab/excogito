@@ -77,6 +77,95 @@ void accept_move(int rem_add[2], cg_mapping *mapping, cg_mapping *new_mapping, a
     }   
 }
 
+void accept_move_spins(int rem_add[2], cg_mapping *mapping, cg_mapping *new_mapping){
+    /**
+    * routine that accepts a Simulated Annealing Spins move. It updates all the relevant observables.
+    *
+    * Parameters
+    * ----------
+    *
+    * `rem_add` : vector of length 2 containing the removed and added atom index
+    * 
+    * `mapping` : cg_mapping object
+    * 
+    * `new_mapping` : cg_mapping object
+    */
+    mapping->mapping[rem_add[0]] = 0;
+    mapping->mapping[rem_add[1]] = 1;
+    mapping->smap = new_mapping->smap;
+}
+
+double tzero_estimation_spins(spin_traj *Trajectory, int cgnum, FILE *f_out_l) {
+    /**
+    * routine that makes *nrun* unbiased moves. It is used to estimate the starting temperature for Simulated Annealing.
+    *
+    * Parameters
+    * ----------
+    *
+    * `Trajectory` : traj object
+    * 
+    * `alignments` : align object
+    * 
+    * `mapping` : cg_mapping object
+    * 
+    * `verbose` : tunes the level of verbosity
+    */
+    printf("tzero_estimation\n");
+    int n_moves = 20;
+    double *deltas; // vector of delta_smap values
+    deltas = d1t(n_moves); // fixed number of moves generated
+    int dummy, nr;
+    int rem_add[2]; // vector containing removed and added atom
+    // mapping
+    printf("allocating mappings\n");
+    cg_mapping *mapping = malloc (sizeof(cg_mapping));
+    mapping->n_at = Trajectory->n_at;
+    mapping->n_cg = cgnum;
+    mapping->mapping = i1t(Trajectory->n_at);
+    mapping->smap = -1.0;
+    mapping->clusters = i1t(Trajectory->frames);
+    mapping->size = i1t(Trajectory->frames);
+    cg_mapping *new_mapping = malloc(sizeof(cg_mapping));
+    new_mapping->n_at = Trajectory->n_at;
+    new_mapping->n_cg = cgnum;
+    new_mapping->smap = -1.0;
+    new_mapping->mapping = i1t(Trajectory->n_at);
+    new_mapping->clusters = i1t(Trajectory->frames);
+    new_mapping->size = i1t(Trajectory->frames);
+    int d_idx = 0;
+    generate_random_mapping(mapping,f_out_l);
+    convert_mapping(mapping, f_out_l);
+    compute_smap_spins(Trajectory, mapping);
+    printf("computing start smap\n");
+    for (nr = 0; nr < n_moves; nr++) {
+        my_make_a_move(mapping, new_mapping, rem_add);
+        convert_mapping(new_mapping, f_out_l);
+        // compute new smap
+        compute_smap_spins(Trajectory, new_mapping);
+        // add delta
+        deltas[d_idx] = fabs(new_mapping->smap - mapping->smap);
+        // updating mapping with new smap and new site
+        mapping->smap = new_mapping->smap;
+        mapping->mapping[rem_add[0]] = 0;
+        mapping->mapping[rem_add[1]] = 1;
+        // increasing index
+        d_idx = d_idx + 1;
+    }
+    double avg_delta = 0.0;
+    fprintf(f_out_l, "collected deltas:\n");
+    for (d_idx = 0; d_idx < n_moves; d_idx++){
+        fprintf(f_out_l, "%lf ", deltas[d_idx]);
+        avg_delta += deltas[d_idx];
+    }
+    avg_delta = avg_delta/(n_moves*1.0);
+    fprintf(f_out_l, "\naverage delta = %8.6lf\n", avg_delta);
+    double corr_t_zero = -avg_delta/(log(0.75));
+    free_mapping(mapping);
+    free_mapping(new_mapping);
+    free_d1t(deltas);
+    return corr_t_zero;
+}
+
 double tzero_estimation(traj *Trajectory, clust_params *clustering, int cgnum, int rsd, int verbose, int kl_flag, FILE *f_out_l) {
     /**
     * routine that makes *nrun* unbiased moves. It is used to estimate the starting temperature for Simulated Annealing.
@@ -92,6 +181,7 @@ double tzero_estimation(traj *Trajectory, clust_params *clustering, int cgnum, i
     * 
     * `verbose` : tunes the level of verbosity
     */
+    printf("tzero_estimation");
     double *deltas; // vector of delta_smap values
     deltas = d1t(20); // fixed number of moves generated
     int dummy, nr;
@@ -311,4 +401,121 @@ void simulated_annealing(traj *Trajectory, clust_params *clustering, MC_params *
     free_mapping(lowest_mapping);
     free_alignment(align);
     free_new_alignment(new_align);
+}
+
+void simulated_annealing_spins(spin_traj *Trajectory, MC_params *SA_params, int cgnum, int verbose, FILE *f_out_l){
+    /**
+    * simulated annealing optimisation of a spin system
+    * Parameters
+    * ----------
+    *
+    * `Trajectory` : traj object
+    * 
+    * `mapping` : cg_mapping object
+    * 
+    * `SA_params` : set of Monte Carlo parameters
+    * 
+    * `verbose` : tunes the level of verbosity
+    * 
+    * `f_out_l` : output filename
+    */
+    fprintf(f_out_l, "simulated_annealing_spins optimisation\n");
+    // setting verbose to 0 if MC_steps*frames > 10^6
+    if (SA_params->MC_steps*Trajectory->frames > 1000000){
+        printf("MC_steps*frames (%d) > 10^6: setting verbose to 0 to avoid wasting too much disk space\n", SA_params->MC_steps*Trajectory->frames);
+        verbose = 0;
+    }
+    cg_mapping *mapping = malloc (sizeof(cg_mapping));
+    cg_mapping *new_mapping = malloc (sizeof(cg_mapping));
+    cg_mapping *lowest_mapping = malloc (sizeof(cg_mapping));
+    // variables
+    int mc; // indexes of mc step and nrun
+    int k; // counter
+    double temp;
+    int dummy;
+    int rem_add[2];
+    // MC
+    double r, p;
+    // mapping
+    mapping->n_at = Trajectory->n_at;
+    mapping->n_cg = cgnum;
+    mapping->mapping = i1t(Trajectory->n_at);
+    mapping->smap = -1.0;
+    mapping->clusters = i1t(Trajectory->frames);
+    mapping->size = i1t(Trajectory->frames);
+    new_mapping->n_at = mapping->n_at;
+    new_mapping->n_cg = cgnum;
+    new_mapping->mapping = i1t(mapping->n_at);
+    new_mapping->clusters = i1t(Trajectory->frames);
+    new_mapping->size = i1t(Trajectory->frames);
+    new_mapping->smap = -1.0;
+    lowest_mapping->n_at = mapping->n_at;
+    lowest_mapping->n_cg = cgnum;
+    lowest_mapping->mapping = i1t(mapping->n_at);
+    lowest_mapping->clusters = i1t(Trajectory->frames);
+    lowest_mapping->size = i1t(Trajectory->frames);
+    lowest_mapping->smap = -1.0;
+    printf("allocated variables\n");
+    // random mapping and rotation matrices (and first rmsd_mat)
+    printf("generating random mapping\n");
+    generate_random_mapping(mapping, f_out_l);
+    fprintf(f_out_l, "Initial mapping\n");
+    convert_mapping(mapping, f_out_l);
+    // calculate start mapping entropy
+    compute_smap_spins(Trajectory, mapping);
+    fprintf(f_out_l, "start observable is %lf\n", mapping->smap);
+    fprintf(f_out_l, "starting opt with T0 = %lf and decay_time %lf\n", SA_params->t_zero, SA_params->decay_time);
+    update_mapping(mapping, lowest_mapping, Trajectory->frames);
+    // optimisation
+    for (mc = 0; mc < SA_params->MC_steps; mc++) {
+        temp = SA_params->t_zero * exp(-((double) mc) / SA_params->decay_time);
+        fprintf(f_out_l, "MC_step %d temp = %lf \n", mc, temp);
+        // print mapping every 50 SA steps
+        if (mc % 50 == 0 & mc != 0 & verbose == 1) {
+            fprintf(f_out_l, "mapping\n");
+            convert_mapping(mapping, f_out_l);
+        }
+        my_make_a_move(mapping, new_mapping, rem_add);
+        fprintf(f_out_l, "move made: removed %d added %d\n", rem_add[0], rem_add[1]);
+        // observable
+        compute_smap_spins(Trajectory, new_mapping);
+        fprintf(f_out_l, "new_smap %lf\n", new_mapping->smap);
+        // MC rule
+        if ((new_mapping->smap - mapping->smap) < 0) {
+            fprintf(f_out_l, "move accepted\n");
+            accept_move_spins(rem_add,mapping,new_mapping);
+            // check lowest
+            if (mapping->smap < lowest_mapping->smap) {
+                fprintf(f_out_l, "Lowest mapping entropy found\n");
+                update_mapping(mapping, lowest_mapping,Trajectory->frames);
+                fprintf(f_out_l, "Printing lowest_smap mapping\n");
+                convert_mapping(lowest_mapping, f_out_l);
+            }
+        } else {
+            r = rand() / (double) RAND_MAX;
+            p = exp((mapping->smap - new_mapping->smap) / temp);
+            if (verbose == 1){fprintf(f_out_l, "r= %lf p = %lf\n", r, p);}
+            if (p > r) {
+                fprintf(f_out_l, "p > r move accepted\n");
+                accept_move_spins(rem_add,mapping,new_mapping);
+                }
+            else {
+                fprintf(f_out_l, "move rejected\n");
+            }
+        }
+        fprintf(f_out_l, "SMAP=%lf\n", mapping->smap);
+    }
+    fprintf(f_out_l, "END OF SIMULATED ANNEALING OPTIMISATION\n");
+    fprintf(f_out_l, "lowest_smap = %lf\n", lowest_mapping->smap);
+    fprintf(f_out_l, "lowest_mapping = \n");
+    for (dummy = 0; dummy < lowest_mapping->n_at; dummy++) { fprintf(f_out_l, "%d ", lowest_mapping->mapping[dummy]); }
+    convert_mapping(lowest_mapping, f_out_l);
+    fprintf(f_out_l, "last_smap %lf\n", mapping->smap);
+    fprintf(f_out_l, "last_mapping\n");
+    for (dummy = 0; dummy < mapping->n_at; dummy++) { fprintf(f_out_l, "%d ", mapping->mapping[dummy]); }
+    convert_mapping(mapping, f_out_l);
+    // freeing variables
+    free_mapping(mapping);
+    free_mapping(new_mapping);
+    free_mapping(lowest_mapping);
 }

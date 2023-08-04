@@ -6,9 +6,9 @@ If you use EXCOGITO in your research please cite:
 
 **EXCOGITO, an EXtensible COarse-GraIning TOol**, M Giulini, R Fiorentini, L Tubiana, R Potestio, *in preparation*
 
-**An Information-Theory-Based Approach for Optimal Model Reduction of Biomolecules**, M Giulini, R Menichetti, MS Shell, R Potestio, *Journal of chemical theory and computation 16 (11), 6795-6813*
+[**An Information-Theory-Based Approach for Optimal Model Reduction of Biomolecules**](https://pubs.acs.org/doi/full/10.1021/acs.jctc.0c00676), M Giulini, R Menichetti, MS Shell, R Potestio, *Journal of chemical theory and computation 16 (11), 6795-6813*
 
-**A journey through mapping space: characterising the statistical and metric properties of reduced representations of macromolecules**, R Menichetti, M Giulini, R Potestio, *The European Physical Journal B 94 (10), 1-26*
+[**A journey through mapping space: characterising the statistical and metric properties of reduced representations of macromolecules**](https://link.springer.com/article/10.1140/epjb/s10051-021-00205-9), R Menichetti, M Giulini, R Potestio, *The European Physical Journal B 94 (10), 1-26*
 
 # 1. Installation #
 
@@ -229,6 +229,24 @@ or
 
 For further information, please type on terminal ```./excogito measure_kl```
 
+## 2.10. optimize_spins Task ##
+
+The **optimize_spins** task requires the _protein code_ string and three input files: _parameter_, _trajectory_, and _probability_. 
+
+In order to launch the **optimize_spins** task follow this syntax: 
+
+
+```bash
+./excogito optimize_spins -p $parameter_file.ini -t $trajectory_file.xyz -r $probability_file.txt -c $prot_code
+
+or 
+
+./excogito measure_kl --p $parameter_file.ini --t $trajectory_file.xyz --probs $probability_file.txt --prot_code $prot_code
+```
+
+Here the trajectory is simply given by the states of a discrete system (like [this](https://github.com/potestiolab/excogito/blob/opt_spins/tests/files/trajectories/spins.csv)).
+
+For further information, please type on terminal ```./excogito optimize_spins```. 
 
 # 3. Which arguments are mandatory? A short explanation #
 
@@ -368,6 +386,8 @@ Inside the directory examples there are example files for the *6d93* protein, al
 - **random_kl**: ```./build/excogito random_kl -p examples/parameters/parameters_randomkl_6d93_N31.ini -t examples/trajectories/6d93_100frames.xyz -r examples/probabilities/6d93_probs_100frames.txt -c 6d93```
 
 - **measure_kl**: ```./build/excogito measure_kl -p examples/parameters/parameters_measurekl_6d93_N31.ini -t examples/trajectories/6d93_100frames.xyz -r examples/probabilities/6d93_probs_100frames.txt -c 6d93 -m examples/mappings/tamapin_ca_mapping.txt```
+
+- **optimize_spins** ```./excogito optimize_spins -p ../examples/parameters/parameters_spins_m1.ini -t ../examples/trajectories/m1_spins_grouped.csv -r ../examples/probabilities/m1_probs.txt -c m1```
 
 # 5. Scaling values #
 

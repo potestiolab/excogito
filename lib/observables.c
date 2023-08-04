@@ -452,6 +452,13 @@ double get_kl(int frames, int curr_nclust, int *clusters, double *energies) {
     return smap;
 }
 
+void compute_smap_spins(spin_traj *Trajectory, cg_mapping *mapping){
+
+    int ncl = spin_clustering(Trajectory->traj_coords, mapping->mapping, mapping->n_at, Trajectory->frames, mapping->clusters, mapping->n_cg);
+    mapping->smap = get_kl(Trajectory->frames, ncl, mapping->clusters, Trajectory->energies);
+    printf("curr. smap = %lf\n", mapping->smap);
+}
+
 void overall_compute_smap(alignments *align, clust_params *clustering, traj *Trajectory, cg_mapping *mapping, int verbose, int kl_flag){
     /** 
     * routine that calls `get_smap` with the correct parameters

@@ -548,7 +548,7 @@ void print_usage_main(char *argv[]){
     *
     * `argv[]` : array of command line arguments
     */
-    char * tasks [] = {"optimize", "random", "measure", "norm", "cosine", "distance", "optimize_kl", "measure_kl", "random_kl"};
+    char * tasks [] = {"optimize", "random", "measure", "norm", "cosine", "distance", "optimize_kl", "measure_kl", "random_kl", "optimize_spins"};
     int n_tasks = sizeof(tasks)/sizeof(tasks[0]);
 
     int tk = 0;
@@ -570,7 +570,7 @@ void print_help_main(char *argv[]){
     *
     * `argv[]` : array of command line arguments
     */
-    char * tasks [] = {"optimize", "random", "measure", "norm", "cosine", "distance","optimize_kl", "measure_kl", "random_kl"};
+    char * tasks [] = {"optimize", "random", "measure", "norm", "cosine", "distance","optimize_kl", "measure_kl", "random_kl", "optimize_spins"};
     int n_tasks = sizeof(tasks)/sizeof(tasks[0]);
 
     int tk = 0;
@@ -642,7 +642,7 @@ void print_help(char *argv[]){
        printf("-n <2nd Mapping FILE> ");
     if(strcmp(argv[1], "distance") == 0)
        printf("-x <Mapping Matrix FILE>");
-    if(strcmp(argv[1], "measure_kl") == 0 || strcmp(argv[1], "optimize_kl") == 0 || strcmp(argv[1], "random_kl") == 0)
+    if(strcmp(argv[1], "measure_kl") == 0 || strcmp(argv[1], "optimize_kl") == 0 || strcmp(argv[1], "random_kl") == 0 || strcmp(argv[1], "optimize_spins") == 0)
        printf("-r <Probability FILE> ");
     
     printf("\n");
@@ -659,7 +659,7 @@ void print_help(char *argv[]){
         printf("--m2 <2nd Mapping File> ");
     if(strcmp(argv[1], "distance") == 0)
         printf("--matrix <Mapping Matrix FILE> ");
-    if(strcmp(argv[1], "measure_kl") == 0 || strcmp(argv[1], "optimize_kl") == 0 || strcmp(argv[1], "random_kl") == 0)
+    if(strcmp(argv[1], "measure_kl") == 0 || strcmp(argv[1], "optimize_kl") == 0 || strcmp(argv[1], "random_kl") == 0 || strcmp(argv[1], "optimize_spins") == 0)
         printf("--prob <Probability FILE> ");
 
     printf("\n");  
@@ -680,7 +680,7 @@ void print_help(char *argv[]){
         printf("   Mapping FILE 2            2nd File with the retained CG sites.\n");
     if(strcmp(argv[1], "distance") == 0)
         printf("   Mapping Matrix FILE       File with a set of CG mappings (one per row).\n");    
-    if(strcmp(argv[1], "measure_kl") == 0 || strcmp(argv[1], "optimize_kl") == 0 || strcmp(argv[1], "random_kl") == 0)
+    if(strcmp(argv[1], "measure_kl") == 0 || strcmp(argv[1], "optimize_kl") == 0 || strcmp(argv[1], "random_kl") == 0 || strcmp(argv[1], "optimize_spins") == 0)
         printf("   Probability FILE          File with the probability value for each frame.\n");
 
     printf("----------------------------------------------------------------------------\n\n"); 
@@ -699,7 +699,7 @@ void print_help(char *argv[]){
         printf("  -n   --m2          FILE       2nd Mapping File (.txt or .dat format)\n");
     if(strcmp(argv[1], "distance") == 0)
         printf("  -x   --matrix      FILE       Mapping Matrix File (.txt or .dat format)\n");
-    if(strcmp(argv[1], "measure_kl") == 0 || strcmp(argv[1], "optimize_kl") == 0 || strcmp(argv[1], "random_kl") == 0)
+    if(strcmp(argv[1], "measure_kl") == 0 || strcmp(argv[1], "optimize_kl") == 0 || strcmp(argv[1], "random_kl") == 0 || strcmp(argv[1], "optimize_spins") == 0)
         printf("  -r   --probs        FILE      Probability File (.txt or .dat format).\n");
 
     printf(" [-h] [--help]                  Give this help list\n");
@@ -966,6 +966,12 @@ void mandatory_files_present(arguments *arguments, char *argv[]){
         n_pars = sizeof(pars)/sizeof(pars[0]);
         check_files(pars,pars_names,n_pars,argv);
     }
+    else if (strcmp(arguments->task , "optimize_spins") == 0){
+        char * pars [] = {arguments->parameter_file, arguments->trajectory_file, arguments->prot_code, arguments->probability_file };
+        char * pars_names [] = { "parameter file", "trajectory file", "protein code", "probability file" };
+        n_pars = sizeof(pars)/sizeof(pars[0]);
+        check_files(pars,pars_names,n_pars,argv);
+    }
 
 }
 
@@ -1093,6 +1099,13 @@ void read_ParameterFile(arguments *arguments, parameters *cc){
     else if (strcmp(arguments->task , "random_kl") == 0){
         int pars [] = { cc->Flag_atomnum, cc->Flag_frames, cc->Flag_cgnum, cc->Flag_n_mappings};
         char * pars_names [] = { "atomnum", "frames", "cgnum", "n_mappings"};
+        n_pars = sizeof(pars)/sizeof(pars[0]);
+        check_parameters(pars, pars_names, n_pars);
+        check_optional_parameters(cc);
+    }
+    else if (strcmp(arguments->task , "optimize_spins") == 0){
+        int pars [] = { cc->Flag_atomnum, cc->Flag_frames, cc->Flag_cgnum, cc->Flag_MC_steps};
+        char * pars_names [] = { "atomnum", "frames", "cgnum", "MC_steps"};
         n_pars = sizeof(pars)/sizeof(pars[0]);
         check_parameters(pars, pars_names, n_pars);
         check_optional_parameters(cc);

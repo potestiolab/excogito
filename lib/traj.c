@@ -121,6 +121,90 @@ void read_EnergyFile(char *EnergyFileName, traj *Trajectory){
     }
 }
 
+void read_spinFile(char *TrajFileName, spin_traj *Trajectory){
+    /**
+    * routine that reads the input xyz coordinate file
+    *
+    * Parameters
+    * ----------
+    *
+    * `TrajFileName` : trajectory filename
+    *
+    * `Trajectory` : traj object
+    */
+ 
+    FILE *ft;                   // trajectory file; 
+    FILE *fe;                   // declaring error file;  
+
+    int rows_i, cols_i, i, p, frame_idx, j, count; 
+    size_t line_buf_size = 0;
+
+    char *token;
+    char *token_arr[100];  //*string, *line;
+    char *string = NULL; 
+    char *line;  
+
+    /* Opening and check if it exist and if it is empty */
+    ft = fopen(TrajFileName, "r");
+    printf("\nReading Spin FILE...\n");
+
+    check_empty_file(ft, TrajFileName);
+
+    rows_i = n_rows(ft);                                // Number of rows in trajectory file "ft".
+    printf("rows i %d", rows_i);
+    fseek(ft, 0, SEEK_SET);
+
+    //string = (char *) malloc (rows_i/Trajectory->frames);                  // Allocate char string;
+   
+    line   = (char *) malloc (200); 					     // Allocate char line with size (lenght) = 200; 
+									     // We are sure that the lenght of each line is less than 200
+
+    /* Initialize the 2D-array Trajectory->traj_coords[][] */
+    for(i = 0; i < Trajectory->frames; i++){
+        for(j = 0; j < Trajectory->n_at; j++){
+            Trajectory->traj_coords[i][j] = 0;
+            Trajectory->traj_coords[i][j] = 0;
+            Trajectory->traj_coords[i][j] = 0;
+        }
+    }
+
+    /* Checking for empty rows; 
+     * Checking that there are ONLY rows with one column and three columns 
+     * Checking that the rows with one column correspond to an integer number i.e. the number of atoms; 
+     * Checking that the rows with three columns are float corresponding to x,y,z trajectory coordinate. */
+
+    frame_idx = 0;                                      // Initialize frame index to  0 
+    p  = 0;                                             // Initialize counter "p" to 0 
+
+    for(i=0; i<rows_i; i++){
+        
+        getline(&string, &line_buf_size, ft);           // Reading entire line;   
+   
+        strcpy(line, string);                           // Copying "string" in "line"; we need it in case of three columns. 
+
+        check_empty_rows(string);                   // that could also be an empty string   
+
+        token = strtok(string, " \t\v\r\n");            // Splitting the string-line in columns separated by spaces, tabs, or \n  or \v or \r
+
+        cols_i = columns(token);                        // Counting the number of columns in each row of file.  
+
+        // printf("number of columns of line %i is %d\n", i, cols_i);
+
+        token_arr[0] = strtok(line, " \t\v\r\n");
+        count = 0;  
+        while(token_arr[count]){
+            count++; 
+            token_arr[count] = strtok(NULL, " \t\v\r\n");
+        }
+
+        // printf("count %d\n", count);
+        
+        for (j=0; j < count ; j++){
+            // TODO: check that each row is full of integers
+            Trajectory->traj_coords[i][j] = atoi(token_arr[j]);          // Assigning each int-string to traj_coords[i][j] 2D-array 
+        }
+    }
+}
 
 void read_TrajectoryFile(char *TrajFileName, traj *Trajectory){
     /**

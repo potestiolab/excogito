@@ -686,5 +686,26 @@ class test26(unittest.TestCase):
         kl_line = lines[1]
         self.assertEqual(kl_line,"explicitly calculating Kullback-Leibler divergences")
 
+class test27(unittest.TestCase):
+    """
+    class that checks the correct functioning of task optimize_spins
+    """
+    def test27_output_exist(self):
+        """check existence of output files"""
+        path = pl.Path("test27/spinkls_fast_delta_N2_0.dat")
+        self.assertEqual((str(path), path.is_file()), (str(path), True))
+        path = pl.Path("test27/spinkls_SA_N2_0.dat")
+        self.assertEqual((str(path), path.is_file()), (str(path), True))
+    def test27_smaps(self):
+        """check that all 3 possible values of smap are calculated"""
+        rfile = open("test27/spinkls_SA_N2_0.dat", "r")
+        lines = rfile.read().split("\n")
+        rfile.close()
+        smaps = [float(ln.split()[-1]) for ln in lines if ln.startswith("new_smap")]
+        assert 0.007167 in smaps
+        assert 0.0 in smaps
+
+
+
 if __name__ == '__main__':
     unittest.main()
