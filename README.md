@@ -244,7 +244,7 @@ or
 ./excogito measure_kl --p $parameter_file.ini --t $trajectory_file.xyz --probs $probability_file.txt --prot_code $prot_code
 ```
 
-Here the trajectory is simply given by the states of a discrete system (like [this](https://github.com/potestiolab/excogito/blob/opt_spins/tests/files/trajectories/spins.csv)).
+Here the trajectory is simply given by the states of a discrete system (like [this](https://github.com/potestiolab/excogito/blob/master/tests/files/trajectories/spins.csv)).
 
 For further information, please type on terminal ```./excogito optimize_spins```. 
 
