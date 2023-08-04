@@ -135,16 +135,13 @@ double tzero_estimation_spins(spin_traj *Trajectory, int cgnum, FILE *f_out_l) {
     int d_idx = 0;
     generate_random_mapping(mapping,f_out_l);
     convert_mapping(mapping, f_out_l);
-    compute_smap_spins(Trajectory, mapping, verbose);
+    compute_smap_spins(Trajectory, mapping);
     printf("computing start smap\n");
-    //overall_compute_smap(align, clustering, Trajectory, mapping, verbose, kl_flag);
     for (nr = 0; nr < n_moves; nr++) {
         my_make_a_move(mapping, new_mapping, rem_add);
         convert_mapping(new_mapping, f_out_l);
-        // if (clustering->crit==3){correct_rmsd_fastclust(align, Trajectory, align, mapping->n_cg, rem_add[0],rem_add[1]);}
-        // else if (kl_flag!=2){correct_rmsd(align, Trajectory, align, mapping->n_cg, rem_add[0],rem_add[1]);}
         // compute new smap
-        compute_smap_spins(Trajectory, new_mapping, verbose);
+        compute_smap_spins(Trajectory, new_mapping);
         // add delta
         deltas[d_idx] = fabs(new_mapping->smap - mapping->smap);
         // updating mapping with new smap and new site
@@ -406,7 +403,7 @@ void simulated_annealing(traj *Trajectory, clust_params *clustering, MC_params *
     free_new_alignment(new_align);
 }
 
-void simulated_annealing_spins(traj *Trajectory, MC_params *SA_params, int cgnum, int verbose, FILE *f_out_l){
+void simulated_annealing_spins(spin_traj *Trajectory, MC_params *SA_params, int cgnum, int verbose, FILE *f_out_l){
     /**
     * simulated annealing optimisation of a spin system
     * Parameters
@@ -465,7 +462,7 @@ void simulated_annealing_spins(traj *Trajectory, MC_params *SA_params, int cgnum
     fprintf(f_out_l, "Initial mapping\n");
     convert_mapping(mapping, f_out_l);
     // calculate start mapping entropy
-    compute_smap_spins(Trajectory, mapping, verbose);
+    compute_smap_spins(Trajectory, mapping);
     fprintf(f_out_l, "start observable is %lf\n", mapping->smap);
     fprintf(f_out_l, "starting opt with T0 = %lf and decay_time %lf\n", SA_params->t_zero, SA_params->decay_time);
     update_mapping(mapping, lowest_mapping, Trajectory->frames);
@@ -481,7 +478,7 @@ void simulated_annealing_spins(traj *Trajectory, MC_params *SA_params, int cgnum
         my_make_a_move(mapping, new_mapping, rem_add);
         fprintf(f_out_l, "move made: removed %d added %d\n", rem_add[0], rem_add[1]);
         // observable
-        compute_smap_spins(Trajectory, new_mapping, verbose);
+        compute_smap_spins(Trajectory, new_mapping);
         fprintf(f_out_l, "new_smap %lf\n", new_mapping->smap);
         // MC rule
         if ((new_mapping->smap - mapping->smap) < 0) {

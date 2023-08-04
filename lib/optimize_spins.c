@@ -32,15 +32,11 @@ int spin_clustering(int **traj_coords, int *mapping, int atomnum, int frames, in
     for (j = 0; j<frames; j++){
         cg_idx = 0;
         for (k = 0; k<atomnum; k++){
-            // printf("frame %d, spin %d, traj %d\n", j, k, traj_coords[j][k]);
             if (mapping[k] == 1){
                 cg_conf[cg_idx] = traj_coords[j][k];
                 cg_idx += 1;
             }
         }
-        // print conf
-        // printf("cg_conf of frame %d %d-%d\n", j, cg_conf[0], cg_conf[1]);
-        
         // looping over previous CG confs
         bool equals = 1;
         for (i = 0; i<cg_conf_num; i++){
@@ -52,15 +48,14 @@ int spin_clustering(int **traj_coords, int *mapping, int atomnum, int frames, in
                 }
             }
             if (equals == 0){
-                // printf("found configuration!\n");
+                // found configuration
                 cg_conf_idx = i;
                 conf_pops[i] += 1;
                 break;
             }
         }
-        // new conf
         if (equals == 1){
-            // printf("new configuration!\n");
+            // new configuration
             for (k = 0; k<cgnum; k++){
                 confs[cg_conf_num][k] = cg_conf[k];
                 conf_pops[cg_conf_num] = 1;
@@ -68,22 +63,9 @@ int spin_clustering(int **traj_coords, int *mapping, int atomnum, int frames, in
             }
             cg_conf_num += 1;
         }
-
         // filling mapping->clusters
         mapping_clusters[j] = cg_conf_idx + 1;
     }
-    // print available cg_confs
-    // for (j = 0; j<cg_conf_num; j++){
-    //     // printf("cg conf number %d : ", j);
-    //     for (k = 0; k<cgnum; k++){
-    //         printf("%d ", confs[j][k]);
-    //     }
-    //     // printf(" with pop %d\n", conf_pops[j]);
-    // }
-    // print mapping->clusters
-    // for (j = 0; j<frames; j++){
-    //     printf("frame %d cl %d\n", j, mapping_clusters[j]);
-    // }
     printf("returning cg_conf_num = %d\n", cg_conf_num);
     return cg_conf_num;
 }
@@ -150,7 +132,7 @@ void optimize_spins(arguments *arguments, parameters *cc){
             double *tzeros; // vector of delta_smap values
             tzeros = d1t(cc->Ncores);
             printf("estimating simulated annealing start temperature\n");
-            #pragma omp parallel shared(Trajectory, clustering) private(q, out_filename)
+            #pragma omp parallel shared(Trajectory) private(q, out_filename)
             {
             #pragma omp for schedule(static, 1)
                 for (q = 0; q < nthreads; q++) {
@@ -158,7 +140,7 @@ void optimize_spins(arguments *arguments, parameters *cc){
                     FILE *f_out_l;
                     f_out_l = open_file_w(out_filename);
                     printf("launching tzero_estimation\n");
-                    tzeros[q] = tzero_estimation_spins(Trajectory, cc->cgnum, arguments->verbose, f_out_l);
+                    tzeros[q] = tzero_estimation_spins(Trajectory, cc->cgnum, f_out_l);
                     fprintf(f_out_l, "t_zero[%d] estimation concluded: starting temperature for simulated annealing = %8.6lf", q, tzeros[q]);
                     fclose(f_out_l);
                 }
@@ -171,7 +153,7 @@ void optimize_spins(arguments *arguments, parameters *cc){
             free_d1t(tzeros);
         }
         printf("t_zero %lf decay_time %lf\n", cc->t_zero, cc->decay_time);
-        #pragma omp parallel shared(Trajectory, clustering) private(q, out_filename)
+        #pragma omp parallel shared(Trajectory) private(q, out_filename)
         {
         #pragma omp for schedule(static, 1)
             for (q = 0; q < nthreads; q++) {
