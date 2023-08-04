@@ -136,7 +136,7 @@ void optimize_spins(arguments *arguments, parameters *cc){
             {
             #pragma omp for schedule(static, 1)
                 for (q = 0; q < nthreads; q++) {
-                    sprintf(out_filename, "./%skl_fast_delta_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
+                    sprintf(out_filename, "./%skls_fast_delta_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
                     FILE *f_out_l;
                     f_out_l = open_file_w(out_filename);
                     printf("launching tzero_estimation\n");
@@ -157,7 +157,7 @@ void optimize_spins(arguments *arguments, parameters *cc){
         {
         #pragma omp for schedule(static, 1)
             for (q = 0; q < nthreads; q++) {
-                sprintf(out_filename, "./%sklsp_SA_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
+                sprintf(out_filename, "./%skls_SA_N%d_%d.dat", arguments->prot_code, cc->cgnum, q); //
                 FILE *f_out_l;
                 f_out_l = open_file_w(out_filename);
                 MC_params *SA_params = malloc (sizeof(MC_params));
