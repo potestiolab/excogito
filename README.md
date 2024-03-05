@@ -387,7 +387,7 @@ Inside the directory examples there are example files for the *6d93* protein, al
 
 - **measure_kl**: ```./build/excogito measure_kl -p examples/parameters/parameters_measurekl_6d93_N31.ini -t examples/trajectories/6d93_100frames.xyz -r examples/probabilities/6d93_probs_100frames.txt -c 6d93 -m examples/mappings/tamapin_ca_mapping.txt```
 
-- **optimize_spins** ```./excogito optimize_spins -p ../examples/parameters/parameters_spins_m1.ini -t ../examples/trajectories/m1_spins_grouped.csv -r ../examples/probabilities/m1_probs.txt -c m1```
+- **optimize_spins** ```./build/excogito optimize_spins -p examples/parameters/parameters_spins_m1.ini -t examples/trajectories/m1_spins_grouped.csv -r examples/probabilities/m1_probs.txt -c m1```
 
 # 5. Scaling values #
 
