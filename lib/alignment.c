@@ -13,7 +13,7 @@
 
 void free_new_alignment(alignments *new_align){
     /**
-    * routine that frees an alignments object used in criterion 1
+    * routine that frees an alignments object used in criterion 3
     * 
     * Parameters
     * ----------
