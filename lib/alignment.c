@@ -534,9 +534,9 @@ void correct_rmsd(alignments *new_align, traj *Trajectory, alignments *align, in
                 msd_added += v[j] * v[j];
             }
             if (align->rsd == 0) {// no rsd, standard rmsd
-                new_align->rmsd_mat[knt] = sqrt(align->rmsd_mat[knt] * align->rmsd_mat[knt] - msd_removed / cgnum + msd_added / cgnum);
+                new_align->rmsd_mat[knt] = sqrt(fabs(align->rmsd_mat[knt] * align->rmsd_mat[knt] - msd_removed / cgnum + msd_added / cgnum));
             } else if (align->rsd == 1) {
-                new_align->rmsd_mat[knt] = sqrt(align->rmsd_mat[knt] * align->rmsd_mat[knt] - msd_removed + msd_added);
+                new_align->rmsd_mat[knt] = sqrt(fabs(align->rmsd_mat[knt] * align->rmsd_mat[knt] - msd_removed + msd_added));
             }
             knt += 1;
         }
@@ -587,7 +587,7 @@ double correct_rmsd_two_frames(traj *Trajectory, double u[9], double com_ref[3],
         msd_added += v[j] * v[j];
     }
     // no rsd, standard rmsd
-    rmsd = sqrt(prev_rmsd * prev_rmsd - msd_removed / cgnum + msd_added / cgnum);
+    rmsd = sqrt(fabs(prev_rmsd * prev_rmsd - msd_removed / cgnum + msd_added / cgnum));
     //} else if (prev_align->rsd == 1) {
     //    rmsd = sqrt(prev_rmsd * prev_rmsd - msd_removed + msd_added);
     //}
