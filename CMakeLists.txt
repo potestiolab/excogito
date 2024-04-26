@@ -19,6 +19,10 @@ if(APPLE)
  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Xpreprocessor -fopenmp")
 endif()
 
+# Release build type
+SET(CMAKE_BUILD_TYPE Release)
+ADD_DEFINITIONS(-ffast-math)
+ADD_DEFINITIONS(-march=native)
 
 # add link to include
 include_directories(${CMAKE_SOURCE_DIR}/include /usr/local/include/) 
