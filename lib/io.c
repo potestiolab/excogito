@@ -12,9 +12,6 @@
 #include <traj.h>
 #include <mapping.h>
 
-//const char *argp_program_version     = "MeTool Program";
-
-const char *argp_program_bug_address = "<raffaele.fiorentini@unitn.it>"; 
 
 void check_int_string(const char *str, int row, char *fname){
     /**
@@ -617,7 +614,7 @@ void print_help_main(char *argv[]){
 
     printf("Try %s <TASK> for more information about the mandatory options of a specific task\n\n", argv[0]); 
     
-    printf("Report bugs to <raffaele.fiorentini@unitn.it>\n"); 
+    printf("Report bugs on https://github.com/potestiolab/excogito/issues\n"); 
 }
 
 void print_help(char *argv[]){
@@ -706,7 +703,7 @@ void print_help(char *argv[]){
     printf(" [-v] [--verbose]               Produce verbose output\n\n");           
 
     printf("\n\n");
-    printf("Report bugs to <raffaele.fiorentini@unitn.it>\n\n");
+    printf("Report bugs on https://github.com/potestiolab/excogito/issues\n\n");
 }
 
 
