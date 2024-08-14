@@ -4,7 +4,7 @@ EXCOGITO is the program to investigate the mapping problem in coarse-grained mod
 
 If you use EXCOGITO in your research please cite:
 
-**EXCOGITO, an EXtensible COarse-GraIning TOol**, M Giulini, R Fiorentini, L Tubiana, R Potestio, *in preparation*
+[**EXCOGITO, an EXtensible COarse-GraIning TOol**](https://pubs.acs.org/doi/10.1021/acs.jcim.4c00490), M Giulini, R Fiorentini, L Tubiana, R Potestio, R Menichetti, *J. Chem. Inf. Model. 2024, 64, 12, 4912–4927*
 
 [**An Information-Theory-Based Approach for Optimal Model Reduction of Biomolecules**](https://pubs.acs.org/doi/full/10.1021/acs.jctc.0c00676), M Giulini, R Menichetti, MS Shell, R Potestio, *Journal of chemical theory and computation 16 (11), 6795-6813*
 
