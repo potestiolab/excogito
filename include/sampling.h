@@ -20,6 +20,8 @@ void my_make_a_move(cg_mapping *old_mapping, cg_mapping *new_mapping, int rem_ad
 
 void simulated_annealing(traj *Trajectory, clust_params *clustering, MC_params *SA_params, int cgnum, int rsd, int verbose, int kl_flag, FILE *f_out_l);
 
+void simulated_annealing_spins(spin_traj *Trajectory, MC_params *SA_params, int cgnum, int verbose, FILE *f_out_l);
+
 double tzero_estimation(traj *Trajectory, clust_params *clustering, int cgnum, int rsd, int verbose, int kl_flag, FILE *f_out_l);
 
 double tzero_estimation_spins(spin_traj *Trajectory, int cgnum, FILE *f_out_l);

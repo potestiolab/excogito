@@ -39,6 +39,8 @@ int check_probabilities(double *probabilities, int prob_length);
 
 void read_EnergyFile(char *EnergyFileName, traj *Trajectory); 
 
+void read_EnergyFile_spins(char *EnergyFileName, spin_traj *Trajectory);
+
 void read_TrajectoryFile(char *TrajFileName, traj *Trajectory);
 
 void read_spinFile(char *TrajFileName, spin_traj *Trajectory);

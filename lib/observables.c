@@ -14,6 +14,7 @@
 #include <alignment.h>
 #include <time.h>
 #include <geometry.h>
+#include <optimize_spins.h>
 
 void compute_coupling_matrix(double *coupling_mat, traj *Trajectory, int fr_id, float sigma){
     /** 
@@ -453,10 +454,19 @@ double get_kl(int frames, int curr_nclust, int *clusters, double *energies) {
 }
 
 void compute_smap_spins(spin_traj *Trajectory, cg_mapping *mapping){
-
+    /**
+    * routine that computes the mapping entropy of a spin-like system
+    * 
+    * Parameters
+    * ----------
+    *
+    * `Trajectory` : spin_traj object
+    *
+    * `mapping` : cg_mapping object
+    */
     int ncl = spin_clustering(Trajectory->traj_coords, mapping->mapping, mapping->n_at, Trajectory->frames, mapping->clusters, mapping->n_cg);
     mapping->smap = get_kl(Trajectory->frames, ncl, mapping->clusters, Trajectory->energies);
-    printf("curr. smap = %lf\n", mapping->smap);
+    // printf("curr. smap = %lf\n", mapping->smap);
 }
 
 void overall_compute_smap(alignments *align, clust_params *clustering, traj *Trajectory, cg_mapping *mapping, int verbose, int kl_flag){
