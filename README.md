@@ -18,10 +18,6 @@ The only requirement is to have [Openmp](https://www.openmp.org/) installed on y
 
 ## 1.2 Additional requirements on MAC OS ##
 
-* Install [argp](https://formulae.brew.sh/formula/argp-standalone) by using homebrew. At the terminal, run this command: 
-```
-brew install argp-standalone 
-```
 
 * Install [xcode](https://apps.apple.com/it/app/xcode/id497799835?mt=12) if your version is higher than MacOs 10.7. You are not required to install the Xcode App from AppStore. 
 At the terminal, just run this command (about 15 Gb are required free on your disk even though, at the end of installation, only 2 Gb will be consumed)
@@ -29,10 +25,26 @@ At the terminal, just run this command (about 15 Gb are required free on your di
 xcode-select --install 
 ```
 
-In order to have access to OpenMP libraries you can install [libomp](https://formulae.brew.sh/formula/libomp) by using homebrew. At the terminal, run this command: 
+You should then install some packages, available both in [Macports](https://ports.macports.org) and [Homebrew](https://brew.sh):
+
+* Install GLIBC arguments parsing functions. Open Terminal, and if you are using Homebrew (package [argp-standalone](https://formulae.brew.sh/formula/argp-standalone)), run: 
+```
+brew install argp-standalone 
+```
+or, using Macports (package [argp-standalone](https://ports.macports.org/port/argp-standalone/)):
+```
+sudo port install argp-standalone
+```
+
+* Install OpenMP libraries. Again, using the Terminal, if you use Homebrew (package [libomp](https://formulae.brew.sh/formula/libomp)), run: 
 ```
 brew install libomp
 ```
+or, using Macports (package [libomp](https://ports.macports.org/port/libomp/)):
+```
+sudo port install libomp
+```
+
 
 ## 1.3 Compiling ## 
 
@@ -47,18 +59,28 @@ cd build
 ```bash
 cmake ..
 ```
+
 3. run make
 ```bash
 make
 ```
 
-### 1.3.2 Compilation options ###
+### 1.3.1 Compilation options ###
 Cmake allows to specify several options, such as the C compiler, compilation links and compilation flags. For instance, if the optimized Intel C compiler (icc) is available, step 2 may be substitued by:
 ```bash
 cmake .. -DCMAKE_C_COMPILER=icc -DCMAKE_C_FLAGS="-Ofast -fopenmp -I./include -mkl -xSSE4.2 -parallel -ipo -mcpu=native"
 ```
 
-On MacOs, the C compiler identification should be AppleClang (check the first line printed on terminal after launching the command ```cmake ..```).
+On MacOS, the C compiler identification should be AppleClang (check the first line printed on terminal after launching the command ```cmake ..```).
+
+
+
+**For Macports users**:
+If you did not set properly your environment, it is possible to have missing libraries error in the compile phase. If this happens, try to explicitly set the position of both headers and libraries to the Macports installation directory (here we considered the standard position):
+```
+cmake -DCMAKE_C_FLAGS="-I/opt/local/include" -DCMAKE_EXE_LINKER_FLAGS="-L/opt/local/lib" ..
+```
+and recompile using ```make```.
 
 # 2. Running #
 
