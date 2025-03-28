@@ -66,7 +66,7 @@ int spin_clustering(int **traj_coords, int *mapping, int atomnum, int frames, in
         // filling mapping->clusters
         mapping_clusters[j] = cg_conf_idx + 1;
     }
-    printf("returning cg_conf_num = %d\n", cg_conf_num);
+    // printf("returning cg_conf_num = %d\n", cg_conf_num);
     return cg_conf_num;
 }
 
@@ -97,7 +97,7 @@ void optimize_spins(arguments *arguments, parameters *cc){
     printf("reading trajectory\n");
     read_spinFile(arguments->trajectory_file, Trajectory);
     printf("reading probabilities\n");
-    read_EnergyFile(arguments->probability_file, Trajectory);
+    read_EnergyFile_spins(arguments->probability_file, Trajectory);
     int i;
     for (i = 0; i < Trajectory->frames; i++){printf("energies %d = %lf\n", i, Trajectory->energies[i]);}
     int isprob = check_probabilities(Trajectory->energies, Trajectory->frames);

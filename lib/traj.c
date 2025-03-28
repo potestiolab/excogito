@@ -116,14 +116,100 @@ void read_EnergyFile(char *EnergyFileName, traj *Trajectory){
         }
         fclose(fn);                                                       // Closing energy file. 
         free(string);
-        //for(i=0; i<rows_i; i++)
-        //    printf("energy[%d] = %f\n", i, Trajectory->energies[i]);
+    }
+}
+
+void read_EnergyFile_spins(char *EnergyFileName, spin_traj *Trajectory){ 
+    /**
+    * routine that reads the input energy file
+    *
+    * Parameters
+    * ----------
+    *
+    * `EnergyFileName` : energies filename
+    *
+    * `Trajectory` : spin_traj object
+    */
+ 
+    FILE *fn;                   // energy file; 
+    FILE *fe;                   // declaring error file 
+
+    int rows_i, cols_i, i; 
+    size_t line_buf_size = 0;
+
+    char *token; //*string;  
+    char *string = NULL; 
+
+    /* Opening and checking if it exist and if it is empty */
+    if(strcmp(EnergyFileName, "-1") == 0){
+        fe = fopen("error.dat", "w");
+        fprintf(fe, "Error. Energy file missing. It is required for the task chosen.\nAborting.\n");
+        printf("Error. Energy file missing. It is required for the task chosen.\nAborting.\n");
+        exit(EXIT_FAILURE);
+    }
+    else{
+        fn = fopen(EnergyFileName, "r");
+
+        printf("\nReading Energy FILE...\n");
+        check_empty_file(fn, EnergyFileName);
+
+        rows_i = n_rows(fn);       
+        fseek(fn, 0, SEEK_SET);
+
+        /* Checking if the number of rows is what we expect: number of rows == number of frames */
+        if(rows_i > Trajectory->frames){
+            fe = fopen("error.dat", "w");
+            fprintf(fe, "Error. Energy file %s contains a number of rows(%d) higher than expected (%d frames)\n Aborting.\n", \
+                    EnergyFileName, rows_i, Trajectory->frames); 
+            fclose(fe); 
+            printf("Error. Energy file %s contains a number of rows(%d) higher than expected (%d frames)\n Aborting.\n",\
+                    EnergyFileName, rows_i, Trajectory->frames);  
+            exit(EXIT_FAILURE);
+        }
+
+        if(rows_i < Trajectory ->frames){
+            fe = fopen("error.dat", "w");
+            fprintf(fe, "Error. Energy file %s contains a number of rows(%d) lower than expected (%d frames)\n Aborting.\n", \
+                    EnergyFileName, rows_i, Trajectory->frames);
+            printf("Error. Energy file %s contains a number of rows(%d) lower than expected (%d frames)\n Aborting.\n", \
+                    EnergyFileName, rows_i, Trajectory->frames);
+            exit(EXIT_FAILURE);
+        }
+
+        /* Checking for not-empty rows, only one column per row, each row is only FLOAT. Assign each float-string to energy[i] array */
+        //string = (char*) malloc (rows_i);                                // Allocate char string 
+
+        for(i=0; i<rows_i; i++) {
+
+            getline(&string, &line_buf_size, fn);                    // Reading entire line. 
+
+            check_empty_rows(string);                       	     // Checking for empty lines in your file. 
+
+            token = strtok(string, " \t\v\r\n");                     // Splitting the string-line in columns separated by spaces, tabs, or \n  or \v or \r
+
+            cols_i = columns(token);   		                     // Counting the number of columns in each row of file.  
+
+            if(cols_i == 1){
+                check_float_string(string, i, EnergyFileName);       // If #column in each row is 1, then check that the column is a float number. 
+                Trajectory->energies[i] = atof(string);              // Assigning each float-string to energy[i] 1D-array. 
+            }
+
+            if(cols_i > 1){
+                fe = fopen("error.dat", "w"); 
+                fprintf(fe,"Error. Each row must contain ONLY ONE column. In your file '%s', the %d-th row, has %d columns\n", EnergyFileName,i+1,cols_i);
+                printf("Error. Each row must contain ONLY ONE column. In your file '%s', the %d-th row, has %d columns\n", EnergyFileName, i+1, cols_i);
+                fclose(fe);
+                exit(EXIT_FAILURE);
+            }
+        }
+        fclose(fn);                                                       // Closing energy file. 
+        free(string);
     }
 }
 
 void read_spinFile(char *TrajFileName, spin_traj *Trajectory){
     /**
-    * routine that reads the input xyz coordinate file
+    * routine that reads the input spin file
     *
     * Parameters
     * ----------
@@ -151,7 +237,7 @@ void read_spinFile(char *TrajFileName, spin_traj *Trajectory){
     check_empty_file(ft, TrajFileName);
 
     rows_i = n_rows(ft);                                // Number of rows in trajectory file "ft".
-    printf("rows i %d", rows_i);
+    // printf("rows i %d", rows_i);
     fseek(ft, 0, SEEK_SET);
 
     //string = (char *) malloc (rows_i/Trajectory->frames);                  // Allocate char string;
